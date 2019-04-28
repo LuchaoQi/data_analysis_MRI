@@ -1,0 +1,168 @@
+```{r message=F}
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+roiDir = "C:/Users/lcqi/OneDrive/Desktop/bcaffo/mri_proj/data"
+fileList = dir(roiDir)
+
+
+#type = 1, level = 1
+# dat = dat %>% mutate(volume_demean = volume - mean(volume))%>% select(roi,volume_demean)%>% spread(roi,volume_demean)
+dat = c()
+dat = list()
+for (i in 1:length(fileList)){
+  fullPath = paste(roiDir, fileList[i], sep = "/")
+  raw_dat = readSubject(fullPath) %>% subject2df()
+  dat_type1 = raw_dat %>% filter(type ==1)
+  # unique(dat_type1$level
+  for (j in 1:4){
+    dat_each = dat_type1 %>% filter(level == j) %>% select(rawid,roi,volume) %>% spread(roi,volume)
+    dat[[paste0('level',j)]] = rbind(dat[[paste0('level',j)]],dat_each)
+  }
+
+  # dat_each = raw_dat %>% filter(type == 1, level == 1) %>% select(roi,volume) %>% spread(roi,volume)
+  # dat = rbind(dat,dat_each)
+}
+
+
+#extract rawid (integer)
+for (j in 1:4){
+  id = dat[[paste0('level',j)]]$rawid
+  dat[[paste0('level',j)]]$rawid = sapply(strsplit(id,"_"),function(x) x[1])
+}
+
+```
+
+
+# ```{r message=F}
+# pca.result = prcomp(dat$level1, scale. = T)
+# library(factoextra)
+# ev = get_eig(pca.result)
+# # ev = pca.result$sdev^2
+# fviz_eig(pca.result)
+# summary(pca.result)
+# library(ggfortify)
+# library(cluster)
+# autoplot(clara(dat$level1, 3))
+# ```
+
+
+# ```{r}
+# library(factoextra)
+# dat_proportion = prop.table(as.matrix(dat$level1),margin = 1) %>% +1 %>% log() 
+# 
+# pca.result = prcomp(dat_proportion,scale. = T)
+# ev_p = get_eig(pca.result)
+# fviz_eig(pca.result)
+# # summary(pca.result)
+# 
+# # dat_visualization = melt(pca.result$rotation)
+# dat_visualization = prop.table(abs(pca.result$rotation),margin = 2) %>% melt()
+# colnames(dat_visualization) = c('roi','PC','value')
+# dat_visualization[,3] = abs(dat_visualization[,3]) 
+# ggplot(dat_visualization, aes(x = as.factor(PC), 
+#                     y = value, 
+#                     fill = as.factor(roi))
+#            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'PC', title = 'type1, level1')
+# 
+# ```
+
+
+
+
+```{r}
+setwd("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data")
+```
+
+
+
+```{r message=F, warning=F}
+#level1
+library(factoextra)
+dat_proportion = dat$level1[, !colnames(dat$level1) %in% "rawid"]
+dat_proportion = prop.table(as.matrix(dat_proportion),margin = 1) %>% log()
+
+
+#PC cumulative proportion
+pca.result = prcomp(dat_proportion,scale. = T)
+ev_p = get_eig(pca.result)
+fviz_eig(pca.result)
+# summary(pca.result)
+
+#feature-weighted PCA results
+# dat_visualization = melt(pca.result$rotation)
+library(data.table)
+dat_visualization = prop.table(abs(pca.result$rotation),margin = 2) %>% melt()
+colnames(dat_visualization) = c('roi','PC','value')
+dat_visualization[,3] = abs(dat_visualization[,3]) 
+ggplot(dat_visualization, aes(x = as.factor(PC), 
+                    y = value, 
+                    fill = as.factor(roi))
+           ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'PC', title = 'type1, level1')
+
+
+
+
+#compositional pca
+
+
+
+#correlation accross gender/age
+
+ref = read.csv("unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
+colnames(ref)[1] = 'rawid'
+ref$rawid = as.character(ref$rawid)
+dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
+
+#accross gender == M
+dat_gender = filter(dat_cor, Gender == 'M')
+dat_gender = dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')]
+res = cor(dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')])
+
+library(Hmisc)
+
+res = rcorr(as.matrix(dat_gender))
+# #correlation matrix
+# res$r
+library(corrplot)
+corrplot(res$r, type="upper", order="hclust", 
+         p.mat = res$P, sig.level = 0.05, insig = "blank")
+
+
+#gender == F
+
+dat_gender = filter(dat_cor, Gender == 'F')
+dat_gender = dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')]
+res = cor(dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')])
+res = rcorr(as.matrix(dat_gender))
+corrplot(res$r, type="upper", order="hclust", 
+         p.mat = res$P, sig.level = 0.05, insig = "blank")
+
+```
+
+```{r}
+# library(factoextra)
+i = 2
+
+dat_proportion = prop.table(as.matrix(dat[[paste0('level',i)]]),margin = 1) %>% log()
+pca.result = prcomp(dat_proportion,scale. = T)
+ev_p = get_eig(pca.result)
+fviz_eig(pca.result)
+# summary(pca.result)
+
+# dat_visualization = melt(pca.result$rotation)
+dat_visualization = prop.table(abs(pca.result$rotation),margin = 2) %>% melt()
+colnames(dat_visualization) = c('roi','PC','value')
+dat_visualization[,3] = abs(dat_visualization[,3])
+ggplot(dat_visualization, aes(x = as.factor(PC), 
+                              y = value, 
+                              fill = as.factor(roi))
+       ) + geom_col() +theme(legend.title = element_blank(),
+                             axis.text.x = element_text(size = 10, angle = 90,vjust=0)) + labs(x = 'PC', title = paste('type1, level',i))
+ 
+```
+
+
+
+
+
