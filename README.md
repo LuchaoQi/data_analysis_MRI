@@ -1,3 +1,3 @@
 # Data analysis on mri data
 ## bcaffo lab
-> Master's program from year 2019-2020
+> Master's program from 2019 to 2020
