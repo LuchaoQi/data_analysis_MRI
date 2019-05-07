@@ -1,0 +1,21 @@
+```{r}
+slice = readDICOM('IM-0001-0001.dcm')
+d = dim(t(slice$img[[1]]))
+image(1:d[1],1:d[2],t(slice$img[[1]]),col=gray(0:64/64))
+
+hist(slice$img[[1]],breaks = 50,probability = 1,col=rgb(0,0,1, 0.2))
+hdr[hdr$name == 'PixelSpacing','value']
+
+all_slices_T1 = readDICOM("T1/")
+#all dcm files
+```
+
+
+
+
+
+```{r}
+nii_T1 = dicom2nifti(all_slices_T1)
+```
+
+
