@@ -204,13 +204,49 @@ corrplot(res.F$r, type="upper", order="hclust",
 ```
 
 
-
-
-
 ```{r message=F}
-#pca across age
+# #pca across age using robCompositions
+# Age = as.character(unique(dat_cor$Age))
+# Age = Age[!is.na(Age)]
+# 
+# dat_age = list()
+# 
+# for (i in Age){
+#   a = dat_cor %>% filter(Age == i)
+#   dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')]
+# }
+# 
+# library(robCompositions)
+# res.rob.age  = list()
+# for (i in names(dat_age)[1:3]){
+#   res.rob.age[[i]] = pcaCoDa(dat_age[[i]])
+# 
+# dat_visualization = prop.table(abs(res.rob.age[[i]]$loadings),margin = 2) %>% melt()
+# colnames(dat_visualization) = c('roi','Comp','value')
+# 
+# 
+# # res.rob$eigenvalues
+# #plot eigenvalues
+# plot(res.rob.age[[i]])
+# print(
+#   ggplot(dat_visualization, aes(x = as.factor(Comp),
+#                     y = value,
+#                     fill = as.factor(roi))
+#            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'Comp', title = paste('compositional PCA across age',i))
+# )
+# }
+```
+
+
+```{r}
+#another way for compositional data analysis
+library(compositions)
+library(factoextra)
+
+#across age
+
 Age = as.character(unique(dat_cor$Age))
-Age = Age[!is.na(Age)]
+Age = sort(Age[!is.na(Age)])
 
 dat_age = list()
 
@@ -219,18 +255,19 @@ for (i in Age){
   dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')] 
 }
 
-library(robCompositions)
-res.rob.age  = list()
-for (i in names(dat_age)[1:3]){
-  res.rob.age[[i]] = pcaCoDa(dat_age[[i]])
+
+
+for (i in names(dat_age)){
+
+  cdata = acomp(dat_age[[i]])
+  cdata.pca = prcomp(cdata,scale. = T)
+  dat_visualization = prop.table(abs(cdata.pca$rotation),margin = 2) %>% melt()
+  colnames(dat_visualization) = c('roi','Comp','value')
+
+print(
+  fviz_eig(cdata.pca)
+)
   
-dat_visualization = prop.table(abs(res.rob.age[[i]]$loadings),margin = 2) %>% melt()
-colnames(dat_visualization) = c('roi','Comp','value')
-
-
-# res.rob$eigenvalues 
-#plot eigenvalues
-plot(res.rob.age[[i]])
 print(
   ggplot(dat_visualization, aes(x = as.factor(Comp), 
                     y = value, 
@@ -240,32 +277,10 @@ print(
 }
 ```
 
-```{r}
-library(factoextra)
-for (i in names(dat_age)){
-dat_proportion = prop.table(as.matrix(dat_age[[i]]),margin = 1) %>% log() 
 
 
-res.pca = prcomp(dat_proportion,scale. = T)
-ev_p = get_eig(res.pca)
-print(
-fviz_eig(res.pca)
-)
-# summary(res.pca)
 
-# dat_visualization = melt(res.pca$rotation)
-dat_visualization = prop.table(abs(res.pca$rotation),margin = 2) %>% melt()
-colnames(dat_visualization) = c('roi','PC','value')
-dat_visualization[,3] = abs(dat_visualization[,3])
-print(
-ggplot(dat_visualization, aes(x = as.factor(PC),
-                               y = value,
-                               fill = as.factor(roi))
-        ) + geom_col() +theme(legend.title = element_blank(),
-                             axis.text.x = element_text(size = 10, angle = 90,vjust=0)) + labs(x = 'PC', title = paste('pca, age',i))
-)
-}
-```
+
 
 
 
