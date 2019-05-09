@@ -154,6 +154,7 @@ ggplot(dat_visualization, aes(x = as.factor(PC),
 ```
 
 ```{r}
+# compositional analysis across level 1
 library(compositions)
 library(factoextra)
 res.comp = dat$level1[,-1] %>%  acomp()%>% prcomp()
@@ -174,9 +175,17 @@ ggplot(dat_visualization, aes(x = as.factor(Comp),
 ```
 
 ```{r}
-#another way for compositional data analysis
+#compositional data analysis across age
+
 library(compositions)
 library(factoextra)
+
+#data processing
+library(tidyverse)
+ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
+colnames(ref)[1] = 'rawid'
+dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
+
 
 #across age
 
@@ -191,6 +200,7 @@ for (i in Age){
 }
 
 
+res.rotations = list()
 
 for (i in names(dat_age)){
 
@@ -198,7 +208,10 @@ for (i in names(dat_age)){
   cdata.pca = prcomp(cdata,scale. = T)
   dat_visualization = prop.table(abs(cdata.pca$rotation),margin = 2) %>% melt()
   colnames(dat_visualization) = c('roi','Comp','value')
-
+  
+  res.rotations[[i]] = prop.table(abs(cdata.pca$rotation),margin = 2) %>% melt() %>% filter(Var2 == 'PC1')
+  colnames(res.rotations[[i]]) = c('roi','PC','value')
+  
 print(
   fviz_eig(cdata.pca)
 )
@@ -210,15 +223,25 @@ print(
            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'Comp', title = paste('compositional PCA across age',i))
 )
 }
+
+
+res.rotations$compile = c()
+
+for (i in names(dat_age)){
+  res.rotations$compile = rbind(res.rotations$compile, select(res.rotations[[i]],c(roi,value)) %>% mutate(Age = i))
+}
+ggplot(res.rotations$compile, aes(x = Age,y = value,colour = roi,group = roi)) + 
+  geom_line() + 
+  labs(title = 'Compositional analysis: weight of roi in PC1')
 ```
 
 
 ```{r message=F}
-#data processing
-library(tidyverse)
-ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
-colnames(ref)[1] = 'rawid'
-dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
+# #data processing
+# library(tidyverse)
+# ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
+# colnames(ref)[1] = 'rawid'
+# dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
 
 #correlation accross gender == M
 dat_gender = list()
