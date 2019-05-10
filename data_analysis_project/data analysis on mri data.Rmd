@@ -1,4 +1,10 @@
 
+```{r}
+view(dat_type1 %>% filter(level == 5))
+```
+
+
+
 ```{r message=F}
 library(tidyverse)
 library(MRIcloudT1volumetrics)
@@ -36,124 +42,66 @@ for (j in 1:4){
 ```
 
 
-# ```{r message=F}
-# res.pca = prcomp(dat$level1, scale. = T)
+
+```{r include = F,message=F, warning=F}
+# #level1 pca
 # library(factoextra)
-# ev = get_eig(res.pca)
-# # ev = res.pca$sdev^2
+# library(magrittr)
+# dat_proportion = dat$level1[, !colnames(dat$level1) %in% "rawid"]
+# dat_proportion = prop.table(as.matrix(dat_proportion),margin = 1) %>% log()
+# #PC cumulative proportion
+# res.pca = prcomp(dat_proportion,scale. = T)
+# #Eigenvalues
+# ev_p = get_eig(res.pca)
+# #barplot(ev_p$eigenvalue)
 # fviz_eig(res.pca)
-# summary(res.pca)
-# library(ggfortify)
-# library(cluster)
-# autoplot(clara(dat$level1, 3))
-# ```
-
-
-
-
-```{r message=F, warning=F}
-#level1 pca
-library(factoextra)
-library(magrittr)
-dat_proportion = dat$level1[, !colnames(dat$level1) %in% "rawid"]
-dat_proportion = prop.table(as.matrix(dat_proportion),margin = 1) %>% log()
-
-
-#PC cumulative proportion
-res.pca = prcomp(dat_proportion,scale. = T)
-
-#Eigenvalues
-ev_p = get_eig(res.pca)
-
-
-#barplot(ev_p$eigenvalue)
-fviz_eig(res.pca)
-# summary(res.pca)
-
-
-
-#feature-weighted PCA results
-# dat_visualization = melt(res.pca$rotation)
-library(data.table)
-dat_visualization = prop.table(abs(res.pca$rotation),margin = 2) %>% melt()
-colnames(dat_visualization) = c('roi','PC','value')
-# dat_visualization[,3] = abs(dat_visualization[,3]) 
-print(
-ggplot(dat_visualization, aes(x = as.factor(PC), 
-                    y = value, 
-                    fill = as.factor(roi))
-           ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'PC', title = 'type1, level1')
-)
-```
-
-
-
-```{r eval=FALSE, echo=F}
-#sublevel
-library(factoextra)
-for (i in 1:2){
-dat_proportion = prop.table(as.matrix(dat[[paste0('level',i)]]),margin = 1) %>% log() 
-res.pca = prcomp(dat_proportion,scale. = T)
-ev_p = get_eig(res.pca)
-fviz_eig(res.pca)
-# summary(res.pca)
-
-# dat_visualization = melt(res.pca$rotation)
-dat_visualization = prop.table(abs(res.pca$rotation),margin = 2) %>% melt()
-colnames(dat_visualization) = c('roi','PC','value')
-dat_visualization[,3] = abs(dat_visualization[,3])
-print(
-ggplot(dat_visualization, aes(x = as.factor(PC),
-                               y = value,
-                               fill = as.factor(roi))
-        ) + geom_col() +theme(legend.title = element_blank(),
-                             axis.text.x = element_text(size = 10, angle = 90,vjust=0)) + labs(x = 'PC', title = paste('type1, level',i))
-)
-}
-```
-
-
-
-
-
-```{r message=F}
-# 
-# #compositional pca
-# library(robCompositions)
-# # res.rob = pcaCoDa(dat$level1[,-1])
-# # dat_proportion = prop.table(as.matrix(dat_proportion),margin = 1)%>% log() %>% abs()
-# # res.rob = pcaCoDa(as.data.frame(dat_proportion))
-# # res.rob = pcaCoDa(dat$level1[,-1]/sum(dat$level1[,-1]))
-# # 
-# # dat_visualization = prop.table(abs(res.rob$loadings),margin = 2) %>% melt()
-# # colnames(dat_visualization) = c('roi','Comp','value')
-# # 
-# # 
-# # # res.rob$eigenvalues 
-# # #plot eigenvalues
-# # plot(res.rob)
-# # ggplot(dat_visualization, aes(x = as.factor(Comp), 
-# #                     y = value, 
-# #                     fill = as.factor(roi))
-# #            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'Comp', title = 'type1, level1, compositional PCA')
-# 
-# # In pcaCoDa package, guess already preprocess the data to get the proportion
-# res.rob = pcaCoDa(dat$level1[,-1])
-# dat_visualization = prop.table(abs(res.rob$loadings),margin = 2) %>% melt()
-# colnames(dat_visualization) = c('roi','Comp','value')
-# 
-# 
-# # res.rob$eigenvalues 
-# #plot eigenvalues
-# plot(res.rob)
-# ggplot(dat_visualization, aes(x = as.factor(Comp), 
-#                     y = value, 
+# # summary(res.pca)
+# #feature-weighted PCA results
+# # dat_visualization = melt(res.pca$rotation)
+# library(data.table)
+# dat_visualization = prop.table(abs(res.pca$rotation),margin = 2) %>% melt()
+# colnames(dat_visualization) = c('roi','PC','value')
+# # dat_visualization[,3] = abs(dat_visualization[,3])
+# print(
+# ggplot(dat_visualization, aes(x = as.factor(PC),
+#                     y = value,
 #                     fill = as.factor(roi))
-#            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'Comp', title = 'type1, level1, compositional PCA')
-
+#            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'PC', title = 'type1, level1')
+# )
 ```
 
-```{r}
+
+
+```{r include = F, eval=FALSE, echo=F}
+# #sublevel
+# library(factoextra)
+# for (i in 1:2){
+# dat_proportion = prop.table(as.matrix(dat[[paste0('level',i)]]),margin = 1) %>% log() 
+# res.pca = prcomp(dat_proportion,scale. = T)
+# ev_p = get_eig(res.pca)
+# fviz_eig(res.pca)
+# # summary(res.pca)
+# 
+# # dat_visualization = melt(res.pca$rotation)
+# dat_visualization = prop.table(abs(res.pca$rotation),margin = 2) %>% melt()
+# colnames(dat_visualization) = c('roi','PC','value')
+# dat_visualization[,3] = abs(dat_visualization[,3])
+# print(
+# ggplot(dat_visualization, aes(x = as.factor(PC),
+#                                y = value,
+#                                fill = as.factor(roi))
+#         ) + geom_col() +theme(legend.title = element_blank(),
+#                              axis.text.x = element_text(size = 10, angle = 90,vjust=0)) + labs(x = 'PC', title = paste('type1, level',i))
+# )
+# }
+```
+
+
+
+
+
+
+```{r include=F}
 # compositional analysis across level 1
 library(compositions)
 library(factoextra)
@@ -184,27 +132,34 @@ library(factoextra)
 library(tidyverse)
 ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
 colnames(ref)[1] = 'rawid'
-dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
+
+#combine with patient info
+dat_cor = list()
+for(i in 1:4){
+  dat_cor[[paste0('level',i)]] = left_join(dat[[paste0('level',i)]], ref[,c('rawid','Age','Gender')], by="rawid")
+}
+
 
 
 #across age
 
-Age = as.character(unique(dat_cor$Age))
+Age = as.character(unique(dat_cor$level1$Age))
 Age = sort(Age[!is.na(Age)])
 
 dat_age = list()
 
 for (i in Age){
-  a = dat_cor %>% filter(Age == i)
-  dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')] 
+  a = dat_cor$level1 %>% filter(Age == i)
+  dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')]
 }
 
 
 res.rotations = list()
 
 for (i in names(dat_age)){
-
+  #compositional data
   cdata = acomp(dat_age[[i]])
+  #pca
   cdata.pca = prcomp(cdata,scale. = T)
   dat_visualization = prop.table(abs(cdata.pca$rotation),margin = 2) %>% melt()
   colnames(dat_visualization) = c('roi','Comp','value')
@@ -235,8 +190,63 @@ ggplot(res.rotations$compile, aes(x = Age,y = value,colour = roi,group = roi)) +
   labs(title = 'Compositional analysis: weight of roi in PC1')
 ```
 
-
 ```{r message=F}
+#PCA after getting rid of CSF
+library(compositions)
+library(factoextra)
+
+
+dat_age_noCSF = list()
+#compositional analysis
+for(i in Age){
+  dat_age_noCSF[[i]] = dat_age[[i]] %>%
+    select(-CSF) %>% acomp()
+}
+
+res.pca = list()
+res.rotations_noCSF = list()
+for(i in Age){
+  res.pca[[i]] = prcomp(dat_age_noCSF[[i]],scale. = T)
+  dat_visualization = prop.table(abs(res.pca[[i]]$rotation),margin = 2) %>% melt()
+  colnames(dat_visualization) = c('roi','PC','value')
+  
+  #further work
+  res.rotations_noCSF[[i]] = dat_visualization %>% filter(PC == 'PC1')
+  
+# print(
+#   fviz_eig(res.pca[[i]])
+# )
+#   
+# print(
+#   ggplot(dat_visualization, aes(x = as.factor(PC), 
+#                     y = value, 
+#                     fill = as.factor(roi))
+#            ) + geom_col() +theme(legend.title = element_blank()) + 
+#     labs(x = 'PC', title = paste('compositional PCA across age',i))
+# )
+}
+
+
+res.rotations_noCSF$compile = c()
+
+for (i in Age){
+  res.rotations_noCSF$compile = rbind(res.rotations_noCSF$compile, 
+                                      select(res.rotations_noCSF[[i]],c(roi,value)) 
+                                      %>% mutate(Age = i))
+}
+ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = roi)) + 
+  geom_line() + 
+  labs(title = 'Compositional analysis: weight of roi in PC1')
+
+```
+
+
+
+
+```{r include = F, message=F}
+
+#correlation
+
 # #data processing
 # library(tidyverse)
 # ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
@@ -245,7 +255,7 @@ ggplot(res.rotations$compile, aes(x = Age,y = value,colour = roi,group = roi)) +
 
 #correlation accross gender == M
 dat_gender = list()
-dat_gender$M = filter(dat_cor, Gender == 'M')
+dat_gender$M = filter(dat_cor$level1, Gender == 'M')
 dat_gender$M = dat_gender$M[, !colnames(dat_gender$M) %in% c('rawid','Age','Gender')]
 
 # res = cor(dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')])
@@ -268,7 +278,7 @@ corrplot(res.M$r, type="upper", order="hclust",
 
 #gender == F
 
-dat_gender$F = filter(dat_cor, Gender == 'F')
+dat_gender$F = filter(dat_cor$level1, Gender == 'F')
 dat_gender$F = dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')]
 # res = cor(dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')])
 res.F = rcorr(as.matrix(dat_gender$F))
@@ -282,38 +292,8 @@ corrplot(res.F$r, type="upper", order="hclust",
 ```
 
 
-```{r message=F}
-# #pca across age using robCompositions
-# Age = as.character(unique(dat_cor$Age))
-# Age = Age[!is.na(Age)]
-# 
-# dat_age = list()
-# 
-# for (i in Age){
-#   a = dat_cor %>% filter(Age == i)
-#   dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')]
-# }
-# 
-# library(robCompositions)
-# res.rob.age  = list()
-# for (i in names(dat_age)[1:3]){
-#   res.rob.age[[i]] = pcaCoDa(dat_age[[i]])
-# 
-# dat_visualization = prop.table(abs(res.rob.age[[i]]$loadings),margin = 2) %>% melt()
-# colnames(dat_visualization) = c('roi','Comp','value')
-# 
-# 
-# # res.rob$eigenvalues
-# #plot eigenvalues
-# plot(res.rob.age[[i]])
-# print(
-#   ggplot(dat_visualization, aes(x = as.factor(Comp),
-#                     y = value,
-#                     fill = as.factor(roi))
-#            ) + geom_col() +theme(legend.title = element_blank()) + labs(x = 'Comp', title = paste('compositional PCA across age',i))
-# )
-# }
-```
+
+
 
 
 
