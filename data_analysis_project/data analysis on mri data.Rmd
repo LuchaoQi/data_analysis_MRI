@@ -210,20 +210,9 @@ for(i in Age){
   dat_visualization = prop.table(abs(res.pca[[i]]$rotation),margin = 2) %>% melt()
   colnames(dat_visualization) = c('roi','PC','value')
   
-  #further work
+  #further work on PC1
   res.rotations_noCSF[[i]] = dat_visualization %>% filter(PC == 'PC1')
   
-# print(
-#   fviz_eig(res.pca[[i]])
-# )
-#   
-# print(
-#   ggplot(dat_visualization, aes(x = as.factor(PC), 
-#                     y = value, 
-#                     fill = as.factor(roi))
-#            ) + geom_col() +theme(legend.title = element_blank()) + 
-#     labs(x = 'PC', title = paste('compositional PCA across age',i))
-# )
 }
 
 
@@ -238,6 +227,27 @@ ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = r
   geom_line() + 
   labs(title = 'Compositional analysis: weight of roi in PC1')
 
+
+
+# PC2 analysis
+
+for ( i in Age){
+  dat_visualization = prop.table(abs(res.pca[[i]]$rotation), margin = 2) %>% melt()
+  colnames(dat_visualization) = c('roi','PC','value')
+  res.rotations_noCSF[[i]] = dat_visualization %>% filter(PC == 'PC2')
+}
+
+res.rotations_noCSF$compile = c()
+for (i in Age){
+  res.rotations_noCSF$compile = rbind(res.rotations_noCSF$compile, 
+                                      select(res.rotations_noCSF[[i]],c(roi,value)) 
+                                      %>% mutate(Age = i))
+}
+ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = roi)) + 
+  geom_line() + 
+  labs(title = 'Compositional analysis: weight of roi in PC2')
+
+
 ```
 
 
@@ -245,57 +255,94 @@ ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = r
 
 ```{r include = F, message=F}
 
-#correlation
-
-# #data processing
-# library(tidyverse)
-# ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
-# colnames(ref)[1] = 'rawid'
-# dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
-
-#correlation accross gender == M
-dat_gender = list()
-dat_gender$M = filter(dat_cor$level1, Gender == 'M')
-dat_gender$M = dat_gender$M[, !colnames(dat_gender$M) %in% c('rawid','Age','Gender')]
-
-# res = cor(dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')])
-
-library(Hmisc)
-
-res.M = rcorr(as.matrix(dat_gender$M))
-
-#correlation matrix
-res.M$r
-
-#visualization
-library(corrplot)
-corrplot(res.M$r, type="upper", order="hclust", 
-         p.mat = res.M$P, sig.level = 0.05, insig = "blank",
-         tl.srt=45,
-         diag=FALSE)
-
-
-
-#gender == F
-
-dat_gender$F = filter(dat_cor$level1, Gender == 'F')
-dat_gender$F = dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')]
-# res = cor(dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')])
-res.F = rcorr(as.matrix(dat_gender$F))
-corrplot(res.F$r, type="upper", order="hclust", 
-         p.mat = res.F$P, sig.level = 0.05, insig = "blank",
-         # addCoef.col = "black",
-         tl.srt=45,
-         diag=FALSE)
-
+# #correlation
+# 
+# # #data processing
+# # library(tidyverse)
+# # ref = read.csv("C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_project/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv", header = T)
+# # colnames(ref)[1] = 'rawid'
+# # dat_cor = left_join(dat$level1, ref[,c('rawid','Age','Gender')], by="rawid")
+# 
+# #correlation accross gender == M
+# dat_gender = list()
+# dat_gender$M = filter(dat_cor$level1, Gender == 'M')
+# dat_gender$M = dat_gender$M[, !colnames(dat_gender$M) %in% c('rawid','Age','Gender')]
+# 
+# # res = cor(dat_gender[, !colnames(dat_gender) %in% c('rawid','Age','Gender')])
+# 
+# library(Hmisc)
+# 
+# res.M = rcorr(as.matrix(dat_gender$M))
+# 
+# #correlation matrix
+# res.M$r
+# 
+# #visualization
+# library(corrplot)
+# corrplot(res.M$r, type="upper", order="hclust", 
+#          p.mat = res.M$P, sig.level = 0.05, insig = "blank",
+#          tl.srt=45,
+#          diag=FALSE)
+# 
+# 
+# 
+# #gender == F
+# 
+# dat_gender$F = filter(dat_cor$level1, Gender == 'F')
+# dat_gender$F = dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')]
+# # res = cor(dat_gender$F[, !colnames(dat_gender$F) %in% c('rawid','Age','Gender')])
+# res.F = rcorr(as.matrix(dat_gender$F))
+# corrplot(res.F$r, type="upper", order="hclust", 
+#          p.mat = res.F$P, sig.level = 0.05, insig = "blank",
+#          # addCoef.col = "black",
+#          tl.srt=45,
+#          diag=FALSE)
 
 ```
 
 
 
 
+```{r}
+# correlation analysis across age
 
 
+# gender = Male
+library(compositions)
+library(corrplot)
+
+dat_male = list()
+res.male = list()
+for ( i in Age){
+  dat_male[[i]] = filter(dat_cor$level1, Gender == 'M', Age == i) %>% select(-c(rawid,Age,Gender))
+  res.male[[i]] = cor.acomp(dat_male[[i]])
+
+  print(
+    corrplot(res.male[[i]], type="upper", order="hclust", 
+         tl.srt=30,
+         diag=FALSE)
+    )
+}
+
+
+```
+
+
+```{r}
+# gender = Female
+dat_female = list()
+res.female = list()
+for ( i in Age){
+  dat_female[[i]] = filter(dat_cor$level1, Gender == 'F', Age == i) %>% select(-c(rawid,Age,Gender))
+  res.female[[i]] = cor.acomp(dat_female[[i]])
+
+  print(
+    corrplot(res.female[[i]], type="upper", order="hclust", 
+         tl.srt=30,
+         diag=FALSE)
+    )
+}
+```
 
 
 
