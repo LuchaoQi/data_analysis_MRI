@@ -243,9 +243,38 @@ for (i in Age){
                                       select(res.rotations_noCSF[[i]],c(roi,value)) 
                                       %>% mutate(Age = i))
 }
+
 ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = roi)) + 
   geom_line() + 
   labs(title = 'Compositional analysis: weight of roi in PC2')
+
+
+#PC3
+
+for ( i in Age){
+  dat_visualization = prop.table(abs(res.pca[[i]]$rotation), margin = 2) %>% melt()
+  colnames(dat_visualization) = c('roi','PC','value')
+  res.rotations_noCSF[[i]] = dat_visualization %>% filter(PC == 'PC3')
+}
+
+res.rotations_noCSF$compile = c()
+for (i in Age){
+  res.rotations_noCSF$compile = rbind(res.rotations_noCSF$compile, 
+                                      select(res.rotations_noCSF[[i]],c(roi,value)) 
+                                      %>% mutate(Age = i))
+}
+ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = roi)) + 
+  geom_line() + 
+  labs(title = 'Compositional analysis: weight of roi in PC3')
+```
+
+
+
+
+
+```{r}
+#pca regression
+
 
 
 ```
@@ -301,6 +330,25 @@ ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = r
 ```
 
 
+```{r}
+library(compositions)
+library(corrplot)
+
+res.allgender = list()
+dat_all_gender = list()
+
+for ( i in Age){
+  dat_all_gender[[i]] = filter(dat_cor$level1, Age == i) %>% select(-c(rawid,Age,Gender))
+  res.allgender[[i]] = cor.acomp(dat_all_gender[[i]])
+  
+  print(
+    corrplot(res.allgender[[i]], type="upper", 
+             # order="hclust", 
+         tl.srt=30,
+         diag=FALSE)
+    )
+}
+```
 
 
 ```{r}
