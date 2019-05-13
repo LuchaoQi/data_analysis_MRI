@@ -318,7 +318,8 @@ for ( i in Age){
   res.male[[i]] = cor.acomp(dat_male[[i]])
 
   print(
-    corrplot(res.male[[i]], type="upper", order="hclust", 
+    corrplot(res.male[[i]], type="upper", 
+             # order="hclust", 
          tl.srt=30,
          diag=FALSE)
     )
@@ -337,7 +338,8 @@ for ( i in Age){
   res.female[[i]] = cor.acomp(dat_female[[i]])
 
   print(
-    corrplot(res.female[[i]], type="upper", order="hclust", 
+    corrplot(res.female[[i]], type="upper", 
+             # order="hclust", 
          tl.srt=30,
          diag=FALSE)
     )
