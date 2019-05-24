@@ -1,0 +1,7 @@
+"0","res.rotations$compile = c()"
+"0","for (i in names(dat_age)){"
+"0","  res.rotations$compile = rbind(res.rotations$compile, select(res.rotations[[i]],c(roi,value)) %>% mutate(Age = i))"
+"0","}"
+"0","ggplot(res.rotations$compile, aes(x = Age,y = value,colour = roi,group = roi)) + "
+"0","  geom_line() + "
+"0","  labs(title = 'Compositional analysis: weight of roi in PC1')"
