@@ -1,5 +1,0 @@
-"0","model = pcr(Age~., data = dat_pcr, scale = TRUE, validation = ""CV"")
-"
-"2","using type = ""numeric"" with a factor response will be ignored"
-"2","Error in colMeans(Y) : 'x' must be numeric
-"

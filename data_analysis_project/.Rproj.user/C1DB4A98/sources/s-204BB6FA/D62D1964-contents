@@ -1,0 +1,40 @@
+```{r}
+Sys.getenv('fsldir')
+library(oro.nifti)
+library(fslr)
+options(fsl.path = '/usr/local/fsl')
+nim=readNIfTI('113-01-MPRAGE.nii.gz',reorient = F)
+#biascorrect: Inhomogeneity correction
+fast_img = fsl_biascorrect(nim,retimg = T) 
+#brain extraction
+bet_fast = fslbet(infile = fast_img, retimg = T)
+bet_fast_mask = niftiarr(bet_fast,1)
+is_in_mask = bet_fast>0
+bet_fast_mask[!is_in_mask] = NA
+
+orthographic(fast_img)
+orthographic(bet_fast)
+orthographic(fast_img,bet_fast_mask)
+
+#improve brain segmentation
+cog = cog(bet_fast,ceil = T)
+cog = paste('-c',paste(cog,collapse = ' '))
+bet_fast2 = fslbet(infile = fast_img,retimg = T, opts = cog)
+orthographic(bet_fast2)
+
+template = readNIfTI('MNI152_T1_1mm_brain.nii.gz',reorient = F)
+orthographic(template)
+registered_fast = flirt(infile = bet_fast2, reffile = template, dof = 6, retimg = T)
+orthographic(registered_fast)
+reg_fast_affine = flirt(infile = bet_fast2, reffile = template, dof = 12, retimg = T)
+orthographic(reg_fast_affine)
+# fnirt_fast = fnirt_with_affine(infile = bet_fast2, reffile = template, outfile = 'FNIRT_to_Template', retimg = T)
+
+
+#ANTsR
+```
+
+
+
+
+

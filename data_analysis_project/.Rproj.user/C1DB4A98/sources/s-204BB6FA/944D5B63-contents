@@ -3,9 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-```{r}
-rm(list = ls())
-```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message = FALSE)
@@ -14,12 +12,17 @@ knitr::opts_chunk$set(message = FALSE)
 
 
 ```{r include=F, eval=F}
+dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1) %>% fixBasalForebrain()
+dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1)
 view(dat_type1 %>% filter(level == 5))
+
+
 ```
 
 
 
 ```{r message=F}
+rm(list = ls())
 library(tidyverse)
 library(MRIcloudT1volumetrics)
 
@@ -33,8 +36,8 @@ dat = c()
 dat = list()
 for (i in 1:length(fileList)){
   fullPath = paste(roiDir, fileList[i], sep = "/")
-  raw_dat = readSubject(fullPath) %>% subject2df()
-  dat_type1 = raw_dat %>% filter(type ==1)
+  raw_dat = readSubject(fullPath) 
+  dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1) %>% fixBasalForebrain()
   # unique(dat_type1$level
   for (j in 1:4){
     dat_each = dat_type1 %>% filter(level == j) %>% select(rawid,roi,volume) %>% spread(roi,volume)
@@ -212,34 +215,89 @@ ggplot(res.rotations_noCSF$compile, aes(x = Age,y = value,colour = roi,group = r
 
 
 
-```{r include=F, eval=F}
-#pca regression
+```{r }
+#pc-score based regression
 
-library(pls)
-library(compositions)
-
-dat_pcr = dat_cor$level1 %>% select(-c(rawid,Gender,Age)) %>% acomp() %>% as.data.frame()
-dat_pcr$Age = dat_cor$level1$Age %>% as.factor()
-
-model = model <- train(
-  Age~., data = dat_pcr, method = "pcr",
-  scale = TRUE,
-  trControl = trainControl("cv", number = 10),
-  tuneLength = 10
+library(data.table)
+pca.score = list()
+for ( i in Age){
+  pca.score[[i]]= data.frame(res.pca[[i]]$x,Age = as.factor(
+    rep(i,nrow(res.pca[[i]]$x)))
   )
+  pca.score$all = rbindlist(list(pca.score$all,pca.score[[i]]),fill = TRUE)
+}
+pca.score$all[is.na(pca.score$all)] = 0
 
-model = pcr(Age~., data = dat_pcr, scale = TRUE, validation = "CV")
 
+#randomly split
+
+library(compositions)
+library(factoextra)
+set.seed(100)
+trainIdx = sample(c(TRUE, FALSE), nrow(dat_cor$level1), replace = TRUE, prob = c(.7, .3))
+dat.pcr = dat_cor$level1 %>% select(-c(rawid,CSF,Gender,Age)) %>% acomp() %>% 
+  prcomp(scale. = T) 
+print(fviz_eig(dat.pcr))
+dat.pcr = as.data.frame(dat.pcr$x) %>% mutate(Age = as.factor(dat_cor$level1$Age))
+  
+pcr.train = dat.pcr[trainIdx,]
+pcr.test = dat.pcr[!trainIdx,]
+
+
+library(tidyverse)
+
+
+model = glm(Age~PC1+PC2,data = pcr.train,family = binomial())
 summary(model)
+
+# > contrasts(pcr.train$Age)
+#       26-30 31-35 36+
+# 22-25     0     0   0
+# 26-30     1     0   0
+# 31-35     0     1   0
+# 36+       0     0   1
+
+if(F){
+y = predict(model,pca.test)
+pcr.prediction = data.frame(pca.test, prob = exp(y)/(1+exp(y)))
+rm(y)
+view(pca.prediction)
+}
+
+if(T){
+y = predict(model,pcr.test,type = 'response')
+pcr.prediction = data.frame(pcr.test, prob = y) %>%
+  mutate(fitted.results = ifelse(pcr.prediction$prob >= 0.8,1,0))
+
+# view(pcr.prediction)
+print(paste('Mean of Probability', mean(pcr.prediction$prob)))
+hist(pcr.prediction$prob)
+print(paste('Accuracy',mean(pcr.prediction$fitted.results)))
+
+}
+# Accuracy ROC/AUC?
+# overfitting? PCs alb point
+
 
 ```
 
 
 
 
-```{r message=F}
-# correlation accross age in all genders
 
+
+
+
+
+
+
+
+```{r message=F}
+if(T){
+  
+
+# correlation accross age in all genders
+# all genders
 library(compositions)
 library(corrplot)
 
@@ -247,10 +305,10 @@ res.allgender = list()
 dat_all_gender = list()
 
 for ( i in Age){
-  dat_all_gender[[i]] = filter(dat_cor$level1, Age == i) %>% select(-c(rawid,Age,Gender))
+  dat_all_gender[[i]] = filter(dat_cor$level1, Age == i) %>% select(-c(rawid,Age,Gender,CSF))
   res.allgender[[i]] = acomp(dat_all_gender[[i]])
   
-  A =   corrplot(cor(res.allgender[[i]]), type="upper", 
+  corrplot(cor(res.allgender[[i]]), type="upper", 
              # order="hclust", 
         
          # title = 'All genders',
@@ -259,10 +317,10 @@ for ( i in Age){
   
 
 }
-```
 
 
-```{r message=F}
+
+
 # correlation analysis across age
 # gender = Male
 
@@ -272,10 +330,10 @@ library(corrplot)
 dat_male = list()
 res.male = list()
 for ( i in Age){
-  dat_male[[i]] = filter(dat_cor$level1, Gender == 'M', Age == i) %>% select(-c(rawid,Age,Gender))
+  dat_male[[i]] = filter(dat_cor$level1, Gender == 'M', Age == i) %>% select(-c(rawid,Age,Gender,CSF))
   res.male[[i]] = acomp(dat_male[[i]])
 
-  A=  corrplot(cor(res.male[[i]]), type="upper", 
+  corrplot(cor(res.male[[i]]), type="upper", 
              # order="hclust", 
          # tl.srt=30,
          # title = 'Male',
@@ -283,23 +341,24 @@ for ( i in Age){
 }
 
 
-```
 
-```{r}
 # correlation analysis across age
 # gender = Female
 
 dat_female = list()
 res.female = list()
 for ( i in Age){
-  dat_female[[i]] = filter(dat_cor$level1, Gender == 'F', Age == i) %>% select(-c(rawid,Age,Gender))
+  dat_female[[i]] = filter(dat_cor$level1, Gender == 'F', Age == i) %>% select(-c(rawid,Age,Gender,CSF))
   res.female[[i]] = acomp(dat_female[[i]])
 
-  A =   corrplot(cor(res.female[[i]]), type="upper", 
+  corrplot(cor(res.female[[i]]), type="upper", 
              # order="hclust",
          # tl.srt=30,
          # title = 'Female',
          diag=FALSE)
+}
+
+
 }
 ```
 
