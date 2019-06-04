@@ -294,8 +294,7 @@ print(paste('Accuracy',mean(pcr.prediction$fitted.results)))
 
 
 ```{r message=F}
-if(T){
-  
+
 
 # correlation accross age in all genders
 # all genders
@@ -360,7 +359,6 @@ for ( i in Age){
 }
 
 
-}
 ```
 
 
