@@ -12,6 +12,7 @@ knitr::opts_chunk$set(message = FALSE)
 
 
 ```{r include=F, eval=F}
+
 dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1) %>% fixBasalForebrain()
 dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1)
 view(dat_type1 %>% filter(level == 5))
@@ -266,8 +267,8 @@ view(pca.prediction)
 
 if(T){
 y = predict(model,pcr.test,type = 'response')
-pcr.prediction = data.frame(pcr.test, prob = y) %>%
-  mutate(fitted.results = ifelse(pcr.prediction$prob >= 0.8,1,0))
+pcr.prediction = data.frame(pcr.test, prob = y)
+pcr.prediction = pcr.prediction %>% mutate(fitted.results = ifelse(pcr.prediction$prob >= 0.8,1,0))
 
 # view(pcr.prediction)
 print(paste('Mean of Probability', mean(pcr.prediction$prob)))
@@ -275,8 +276,8 @@ hist(pcr.prediction$prob)
 print(paste('Accuracy',mean(pcr.prediction$fitted.results)))
 
 }
-# Accuracy ROC/AUC?
-# overfitting? PCs alb point
+
+# overfitting? PCA elbow point
 
 
 ```

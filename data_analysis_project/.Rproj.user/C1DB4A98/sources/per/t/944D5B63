@@ -5,16 +5,16 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "295|6|361|0|\n",
-    "hash" : "3623692691",
+    "hash" : "2650374413",
     "id" : "944D5B63",
-    "lastKnownWriteTime" : 1559594115,
-    "last_content_update" : 1559594115808,
+    "lastKnownWriteTime" : 1559620903,
+    "last_content_update" : 1559620903520,
     "path" : "C:/Users/lcqi/OneDrive/Desktop/bcaffo/mri_data_analysis/data_analysis_project/data analysis on mri data.Rmd",
     "project_path" : "data analysis on mri data.Rmd",
     "properties" : {
-        "cursorPosition" : "274,0",
+        "cursorPosition" : "277,0",
         "last_setup_crc32" : "204BB6FAae36ea38",
-        "scrollLine" : "264"
+        "scrollLine" : "248"
     },
     "relative_order" : 1,
     "source_on_save" : false,

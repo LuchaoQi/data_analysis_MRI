@@ -275,8 +275,8 @@ hist(pcr.prediction$prob)
 print(paste('Accuracy',mean(pcr.prediction$fitted.results)))
 
 }
-# Accuracy ROC/AUC?
-# overfitting? PCs alb point
+
+# overfitting? PCA elbow point
 
 
 ```
