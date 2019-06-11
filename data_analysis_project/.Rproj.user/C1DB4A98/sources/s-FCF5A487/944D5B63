@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1558717922155.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "944D5B63",
+    "lastKnownWriteTime" : 1560286448,
+    "last_content_update" : 1560286448533,
+    "path" : "C:/Users/lcqi/OneDrive/Desktop/bcaffo/data_analysis_mri/data_analysis_project/data analysis on mri data.Rmd",
+    "project_path" : "data analysis on mri data.Rmd",
+    "properties" : {
+        "cursorPosition" : "288,0",
+        "last_setup_crc32" : "FCF5A487ae36ea38",
+        "scrollLine" : "276"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

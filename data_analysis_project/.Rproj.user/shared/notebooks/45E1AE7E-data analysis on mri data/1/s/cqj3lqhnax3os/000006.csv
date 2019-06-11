@@ -1,5 +1,0 @@
-"0","  dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1) %>% fixBasalForebrain()
-"
-"2","Error in UseMethod(""filter_"") : 
-  no applicable method for 'filter_' applied to an object of class ""c('matrix', 'character')""
-"
