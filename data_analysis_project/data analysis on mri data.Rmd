@@ -17,7 +17,7 @@ dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1) %>% fixBasalForebrain(
 dat_type1 = raw_dat %>% subject2df() %>% filter(type ==1)
 view(dat_type1 %>% filter(level == 5))
 
-
+corrplot(cor(dat.train[,-8]))
 ```
 
 
@@ -186,15 +186,24 @@ rm(PC)
 # split dataset
 library(caret)
 set.seed(100)
+
+# a = data.frame(dat_cor$level1 %>% select(-c(rawid,Gender,Age)) %>% acomp(),Age = dat_cor$level1$Age)
+# dat.train = a[trainIdx,]
+# dat.test = a[!trainIdx,]
+
+
 trainIdx = sample(c(TRUE, FALSE), nrow(dat_cor$level1), replace = TRUE, prob = c(.7, .3))
-dat = dat_cor$level1 %>% select(-c(rawid,CSF,Gender,Age)) %>% acomp() %>% 
-  prcomp(scale. = T) 
+dat = dat_cor$level1 %>% select(-c(rawid,Gender,Age)) %>% acomp() %>%
+  prcomp(scale. = T)
+
 print(fviz_eig(dat))
 dat = as.data.frame(dat$x) %>% mutate(Age = as.factor(dat_cor$level1$Age))
   
 dat.train = dat[trainIdx,]
 dat.test = dat[!trainIdx,]
 
+ggplot(as.data.frame(dat),aes(x=PC1,y=PC2))+
+    geom_point()+labs(title = 'pca')
 ```
 
 ```{r}
@@ -210,7 +219,7 @@ print(paste('Accuracy',table(dat.prediction == dat.test$Age)["TRUE"]/length(dat.
 
 
 if(F){
-multinomModel = train(Age~PC1+PC2+PC3,data = dat.train,
+multinomModel = train(Age~PC1 + PC2,data = dat.train,
               method = "multinom")
 dat.predicted_score = predict (multinomModel, dat.test, "prob")
 dat.prediction = predict(multinomModel, dat.test)
@@ -249,15 +258,15 @@ print(paste('Accuracy',table(dat.prediction == dat.test$Age)["TRUE"]/length(dat.
 
 
 
+
 ```{r }
 #logistic regression
-
-
+if(F){
 library(compositions)
 library(factoextra)
 library(tidyverse)
 
-model = glm(Age~PC1+PC2,data = dat.train,family = binomial())
+model = glm(Age~ PC1 + PC2 + PC3,data = dat.train,family = binomial())
 summary(model)
 
 # > contrasts(dat.train$Age)
@@ -294,7 +303,7 @@ print(paste('Accuracy',mean(dat.prediction$fitted.results)))
 # Prob threshold : 0.7
 # [1] "Mean of Probability 0.793325551290113"
 # [1] "Accuracy 1"
-
+}
 ```
 
 
@@ -309,7 +318,6 @@ print(paste('Accuracy',mean(dat.prediction$fitted.results)))
 
 
 ```{r message=F}
-
 
 # correlation accross age in all genders
 # all genders
