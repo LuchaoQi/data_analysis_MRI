@@ -1,0 +1,62 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = F)
+```
+
+
+
+```{r}
+rm(list = ls())
+load('dat_cor.Rdata')
+library(compositions)
+library(factoextra)
+library(data.table)
+library(tidyverse)
+library(caret)
+set.seed(100)
+  
+
+trainIdx = sample(c(TRUE, FALSE), nrow(dat_cor$level1), replace = TRUE, prob = c(.7, .3))
+dat = dat_cor$level1 %>% select(-c(rawid,Gender,Age)) %>% acomp() %>%
+  prcomp(scale. = T)
+dat = as.data.frame(dat$x) %>% mutate(Age = as.factor(dat_cor$level1$Age))
+  
+dat.train = dat[trainIdx,]
+dat.test = dat[!trainIdx,]
+
+head(dat)
+```
+
+```{r }
+# multinomial regression
+multinomModel = train(Age~.,data = dat.train,
+              method = "multinom",trace = F )
+# multinomial.predicted_score = predict (multinomModel, dat.test, "prob")
+dat.prediction = predict(multinomModel, dat.test)
+
+print(paste('Accuracy',table(dat.prediction == dat.test$Age)["TRUE"]/length(dat.test$Age)))
+
+
+
+# SVM
+svmModel = train(Age~.,data = dat.train,
+                 method = "svmLinear",trace = F)
+dat.prediction = predict(svmModel,dat.test)
+
+print(paste('Accuracy',table(dat.prediction == dat.test$Age)["TRUE"]/length(dat.test$Age)))
+
+
+# Multi-Layer Perceptron
+neuralModel = train(Age~.,data = dat.train,
+                    method = "mlp",trace = F)
+dat.prediction = predict(neuralModel,dat.test)
+
+print(paste('Accuracy',table(dat.prediction == dat.test$Age)["TRUE"]/length(dat.test$Age)))
+
+```
+
