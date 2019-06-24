@@ -6,8 +6,7 @@
 #' @importFrom data.table melt
 #' @export
 
-MRIPCAvisualization = function(pca.result = NULL, PC = 1){
-
+MRIPCAvisualization = function(pca.result, PC = 1){
     pca.rotations = sapply(pca.result, function(i) i$rotation)
     dat_visualization = lapply(pca.rotations, function(i){
       prop.table(abs(i),margin = 2) %>%
@@ -15,7 +14,8 @@ MRIPCAvisualization = function(pca.result = NULL, PC = 1){
         `colnames<-` (c('roi','Comp','value')) %>%
         filter(Comp == paste0('PC',PC)) %>% select(c(roi,value))
       }) %>%
-      do.call(what = "rbind") %>% #convert to data frame
+      do.call(what = "rbind") #convert to data frame
+    dat_visualization = dat_visualization %>%
       mutate(Age = sapply(strsplit(rownames(dat_visualization), "[.]"),function(x) x[1])
              ) # rownames reformat
 

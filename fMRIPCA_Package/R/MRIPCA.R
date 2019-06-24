@@ -5,15 +5,16 @@
 #' @param Type type of MRI sequences(T1-weighted, T2-weighted, etc.), default = 1
 #' @param Level level of MRI, default = 1
 #' @importFrom magrittr "%>%"
-#' @importFrom dplyr filter mutate rename left_join group_by
+#' @importFrom dplyr filter mutate rename left_join group_by select
+#' @importFrom tidyr spread
 #' @export
 
-MRIPCA = function(data = NULL, infodir = NULL,Type = 1, Level = 1){
+MRIPCA = function(data, infodir,Type = 1, Level = 1){
     # preprocessing
-    dat = data %>% 
-        filter(type == Type, level == Level) %>% 
-        select(rawid,roi,volume) %>% 
-        spread(roi,volume) 
+    dat = data %>%
+        filter(type == Type, level == Level) %>%
+        select(rawid,roi,volume) %>%
+        spread(roi,volume)
     # change the format of rawid as is compatible with patient info
     dat$rawid  = as.numeric(sapply(strsplit(dat$rawid, "_"),function(x) x[1]))
     # compositions, weight of each roi
@@ -21,7 +22,7 @@ MRIPCA = function(data = NULL, infodir = NULL,Type = 1, Level = 1){
                      t(apply(dat,1, function(i) i[-1]/sum(i[-1])))
                       )
     # patient info
-    info = read.csv(infodir, header = T) %>% 
+    info = read.csv(infodir, header = T) %>%
         rename('rawid' = 'Subject')
     # merge data frame by rawid
     dat = left_join(dat,info[,c('rawid','Age')], by = 'rawid') %>% select(-rawid) %>% na.omit()
@@ -32,8 +33,8 @@ MRIPCA = function(data = NULL, infodir = NULL,Type = 1, Level = 1){
     })
     # dat %>% filter(Age == '36+')%>% select(-Age)
     # prcomp(dat %>% filter(Age == '36+') %>% select(-Age),scale. = T)
-    
+
     return(pca.result)
-    
+
 }
 
