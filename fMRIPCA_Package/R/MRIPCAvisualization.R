@@ -1,5 +1,6 @@
 #' @name MRIPCAvisualization
 #' @title A function for visualization of principal component rotations
+#' @author Luchao Qi
 #' @param pca.result should use function MRIPCA to get a list of pca result
 #' @param PC index of PC, default = 1
 #' @importFrom ggplot2 ggplot

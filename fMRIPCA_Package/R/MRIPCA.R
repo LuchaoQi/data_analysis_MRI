@@ -1,9 +1,10 @@
 #' @name MRIPCA
 #' @title A function for compositional principal component analysis of ROIs across age
+#' @author Luchao Qi
 #' @param data use readFileList function to get MRI data frame
 #' @param infodir path to lookup table of patient info
-#' @param Type type of MRI sequences(T1-weighted, T2-weighted, etc.), default = 1
-#' @param Level level of MRI, default = 1
+#' @param Type optinal,type of MRI sequences(T1-weighted, T2-weighted, etc.), default = 1
+#' @param Level optional,level of MRI, default = 1
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr filter mutate rename left_join group_by select
 #' @importFrom tidyr spread
