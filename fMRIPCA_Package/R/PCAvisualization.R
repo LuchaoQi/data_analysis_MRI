@@ -1,4 +1,4 @@
-#' @name MRIPCAvisualization
+#' @name PCAvisualization
 #' @title A function for visualization of principal component rotations
 #' @author Luchao Qi
 #' @param pca.result should use function MRIPCA to get a list of pca result
@@ -7,7 +7,7 @@
 #' @importFrom data.table melt
 #' @export
 
-MRIPCAvisualization = function(pca.result, PC = 1){
+PCAvisualization = function(pca.result, PC = 1){
     pca.rotations = sapply(pca.result, function(i) i$rotation)
     dat_visualization = lapply(pca.rotations, function(i){
       prop.table(abs(i),margin = 2) %>%

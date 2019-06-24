@@ -1,4 +1,4 @@
-#' @name MRIPCA
+#' @name PCA
 #' @title A function for compositional principal component analysis of ROIs across age
 #' @author Luchao Qi
 #' @param data use readFileList function to get MRI data frame
@@ -10,7 +10,7 @@
 #' @importFrom tidyr spread
 #' @export
 
-MRIPCA = function(data, infodir,Type = 1, Level = 1){
+PCA = function(data, infodir,Type = 1, Level = 1){
     # preprocessing
     dat = data %>%
         filter(type == Type, level == Level) %>%
