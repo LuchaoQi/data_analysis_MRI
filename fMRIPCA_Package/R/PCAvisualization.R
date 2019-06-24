@@ -3,7 +3,7 @@
 #' @author Luchao Qi
 #' @param pca.result should use function MRIPCA to get a list of pca result
 #' @param PC index of PC, default = 1
-#' @importFrom ggplot2 ggplot
+#' @import ggplot2
 #' @importFrom data.table melt
 #' @export
 
