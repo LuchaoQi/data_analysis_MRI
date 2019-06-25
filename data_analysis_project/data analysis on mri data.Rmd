@@ -101,6 +101,8 @@ for (i in Age){
   dat_age[[i]] =  a[, !colnames(a) %in% c('rawid','Age','Gender')]
 }
 
+# view(prcomp( t(apply(dat_age$`26-30`,1,function(i) i/sum(i))), scale. = T)$rotation)
+#################################################################
 
 res.rotations = list()
 
