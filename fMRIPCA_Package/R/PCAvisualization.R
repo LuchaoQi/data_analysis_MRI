@@ -4,6 +4,7 @@
 #' @param pca.result should use function MRIPCA to get a list of pca result
 #' @param PC index of PC, default = 1
 #' @import ggplot2
+#' @importFrom ggplot2 aes
 #' @importFrom data.table melt
 #' @export
 
