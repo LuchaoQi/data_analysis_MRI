@@ -1,7 +1,0 @@
-"0","# split dataset"
-"0","library(caret)"
-"0","set.seed(100)"
-"0","trainIdx = sample(c(TRUE, FALSE), nrow(dat_cor$level1), replace = TRUE, prob = c(.7, .3))"
-"0","dat = dat_cor$level1 %>% select(-c(rawid,CSF,Gender,Age)) %>% acomp() %>% "
-"0","  prcomp(scale. = T) "
-"0","print(fviz_eig(dat))"

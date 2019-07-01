@@ -1,4 +1,0 @@
-"0","dat = as.data.frame(dat$x) %>% mutate(Age = as.factor(dat_cor$level1$Age))"
-"0","  "
-"0","dat.train = dat[trainIdx,]"
-"0","dat.test = dat[!trainIdx,]"
