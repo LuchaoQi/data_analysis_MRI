@@ -6,4 +6,4 @@
 >
 > Check project [here](<https://github.com/LuchaoQi/data_analysis_bcaffo_lab/tree/master/MRI%20data%20analysis>).
 >
-> Check final package [here](https://github.com/LuchaoQi/MRIPCA).
+> Check MRIPCA package [here](https://github.com/LuchaoQi/MRIPCA).
