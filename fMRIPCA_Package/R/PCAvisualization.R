@@ -10,6 +10,10 @@
 
 PCAvisualization = function(pca.result, PC = 1){
     pca.rotations = sapply(pca.result, function(i) i$rotation)
+    # a = apply(abs(pca.rotations),MARGIN = 2,FUN = function(i) i/sum(i)) %>%
+    #     melt() %>%
+    #     `colnames<-` (c('Features','Component','value')) %>%
+    #     filter(Component == paste0('PC',PC))
     dat_visualization = lapply(pca.rotations, function(i){
       prop.table(abs(i),margin = 2) %>%
         melt() %>%
