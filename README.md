@@ -7,3 +7,20 @@
 > Check project [here](<https://github.com/LuchaoQi/data_analysis_bcaffo_lab/tree/master/MRI%20data%20analysis>).
 >
 > Check MRIPCA package [here](https://github.com/LuchaoQi/MRIPCA).
+
+## Workflow
+
+* Convert MRI volumes to compositional data
+
+* PCA
+
+* Multinomial prediction on Age based on `PC scores`
+
+  ```R
+  PCA$x #PC scores
+  PCA$rotations #Can be used to visualize the importance of different features i.e. ROIs
+  ```
+
+* Low ACC still need to be solved
+
+  
