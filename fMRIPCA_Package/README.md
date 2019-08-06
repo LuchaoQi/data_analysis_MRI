@@ -9,3 +9,7 @@ A package for principal component analysis on T1 volumetric analysis of MRIcloud
 # install.packages("devtools")
 devtools::install_github("LuchaoQi/MRIPCA")
 ```
+
+## Update
+
+Check the latest version [`MRIcloudT1volumetrics`](https://github.com/bcaffo/MRIcloudT1volumetrics)
