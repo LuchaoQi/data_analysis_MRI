@@ -7,6 +7,8 @@
 > Check MRI project [here](<https://github.com/LuchaoQi/data_analysis_bcaffo_lab/tree/master/MRI%20data%20analysis>).
 >
 > Check MRIPCA package [here](https://github.com/LuchaoQi/MRIPCA).
+>
+> Check rnhanes project survival analysis [here](https://github.com/LuchaoQi/rnhanesdata).
 
 ## Workflow
 
