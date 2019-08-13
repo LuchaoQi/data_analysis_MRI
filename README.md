@@ -24,6 +24,6 @@
 
 * Low ACC still need to be solved
 
-## rnhanes project workflow  
+## rnhanes project: survival analysis
 
 > To be updated
