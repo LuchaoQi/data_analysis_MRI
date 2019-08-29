@@ -15,7 +15,7 @@
 
 * PCA
 
-* Multinomial prediction on Age based on `PC scores`
+* Multinomial prediction `multinom` on Age based on `PC scores`
 
   ```R
   PCA$x #PC scores
