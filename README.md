@@ -20,7 +20,9 @@
 
 ---
 
-Goal
+1/10/2020
+
+Updated
 
 > We want to find the most predictable region and the most important variable to investigate associations b/w ROIs
 
