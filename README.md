@@ -1,14 +1,8 @@
 # Data analysis bcaffo lab
 
-- Master's program from 2019 to 2020
 
-> Check MRI project [here](<https://github.com/LuchaoQi/data_analysis_bcaffo_lab/tree/master/MRI%20data%20analysis>).
->
-> Check MRIPCA package [here](https://github.com/LuchaoQi/MRIPCA).
->
-> Check rnhanes project survival analysis [here](https://github.com/LuchaoQi/rnhanesdata).
 
-## MRI project workflow
+### Summary
 
 > This is a compositional data analysis project based on MRI data. The goal is to perform PCA analysis and predict the Age of patients based on PC scores of ROIs. All functions are intended to be built into [`MRIcloudT1volumetrics`](https://github.com/bcaffo/MRIcloudT1volumetrics) package.
 * Convert MRI volumes to compositional data
@@ -24,8 +18,19 @@
 
 * Low ACC still need to be solved
 
-## rnhanes project: survival analysis
+---
 
-> To be updated
+Goal
+
+> We want to find the most predictable region and the most important variable to investigate associations b/w ROIs
+
+Method
+
+> conditional independence graph ~ volumetric MRI
 >
-> new repo created [here](https://github.com/LuchaoQi/rnhanesdata)
+> - Differ across age/gender
+> - Sparse version
+>
+> Raw correlation
+>
+> Lasso regression/ Elastic net
