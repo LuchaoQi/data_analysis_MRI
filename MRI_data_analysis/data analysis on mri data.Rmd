@@ -22,6 +22,24 @@ corrplot(cor(dat.train[,-8]))
 
 
 
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+
+roiDir = paste0(getwd(),'/data')
+file_list = dir(roiDir)
+# readSubjectDf(file_list[1])$level
+# run it in console
+data = readFileList(fileList = file_list,fixBF = TRUE)
+
+
+
+```
+
+
+
 ```{r message=F}
 rm(list = ls())
 library(tidyverse)
@@ -31,8 +49,6 @@ roiDir = paste0(getwd(),'/data')
 fileList = dir(roiDir)
 
 
-#type = 1, level = 1
-# dat = dat %>% mutate(volume_demean = volume - mean(volume))%>% select(roi,volume_demean)%>% spread(roi,volume_demean)
 dat = c()
 dat = list()
 for (i in 1:length(fileList)){
@@ -56,7 +72,7 @@ for (j in 1:4){
   dat[[paste0('level',j)]]$rawid = as.numeric(sapply(strsplit(id,"_"),function(x) x[1]))
 }
 
-save(dat,file = 'dat.Rdata')
+save(dat,file = 'data.Rdata')
 rm(list = ls())
 
 ```
@@ -74,7 +90,7 @@ load('dat.Rdata')
 library(compositions)
 library(factoextra)
 library(data.table)
-
+  
 #data processing
 library(tidyverse)
 

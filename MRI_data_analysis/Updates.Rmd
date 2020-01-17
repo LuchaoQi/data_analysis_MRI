@@ -1,0 +1,18 @@
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+
+roiDir = paste0(getwd(),'/data')
+file_list = dir(roiDir)
+# readSubjectDf(file_list[1])$level
+# run it in console
+data = readFileList(fileList = file_list,fixBF = TRUE)
+
+# spreadROIs
+data_level5 = data %>% filter(level == 5)
+
+dim(data %>% filter(level == 5) %>% select(roi) %>% unique)
+```
