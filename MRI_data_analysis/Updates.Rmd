@@ -12,7 +12,7 @@ file_list = dir(roiDir)
 data = readFileList(fileList = file_list,fixBF = TRUE)
 
 # spreadROIs
-data_level5 = data %>% filter(level == 5)
+data_level1 = data %>% filter(level == 1)
 
-dim(data %>% filter(level == 5) %>% select(roi) %>% unique)
+dim(data %>% filter(level == 1) %>% select(roi) %>% unique)
 ```
