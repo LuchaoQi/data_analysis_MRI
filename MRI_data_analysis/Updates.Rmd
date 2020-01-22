@@ -22,8 +22,6 @@ save(data, file = 'raw.rda')
 rm(list = ls())
 load(file = 'raw.rda')
 
-# spreadROIs
-
 
 
 
