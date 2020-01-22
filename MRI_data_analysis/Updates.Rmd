@@ -13,13 +13,16 @@ file_list = dir(roiDir)
 data = readFileList(fileList = file_list,fixBF = TRUE)
 save(data, file = 'raw.rda')
 
-# spreadROIs
 
 ```
 
 
 
 ```{r}
+rm(list = ls())
+load(file = 'raw.rda')
+
+# spreadROIs
 
 
 
