@@ -16,3 +16,39 @@ data_level1 = data %>% filter(level == 1)
 
 dim(data %>% filter(level == 1) %>% select(roi) %>% unique)
 ```
+
+
+
+```{r}
+
+
+
+```
+
+```{r}
+file.sources = list.files(c("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/muvis"), 
+                          pattern="*.R$", full.names=TRUE, 
+                          ignore.case=TRUE)
+sapply(file.sources,source,.GlobalEnv)
+library(tidyverse)
+library(psych)
+
+data(bfi)
+bfi <- bfi[,1:25]
+data = bfi %>% na.omit()
+nhanes_dgm <- dgm(data, dtype = "gaussian", alpha = 1e-15, plot = F)
+
+# Find the largest connected component
+library(igraph)
+grph_clustrs <- clusters(nhanes_dgm$graph)
+new_dgm <- induced.subgraph(nhanes_dgm$graph, V(nhanes_dgm$graph)[which(grph_clustrs$membership == which.max(grph_clustrs$csize))])
+
+# Visualize the graph
+dgm_vis <- graph_vis(new_dgm, plot = F, directed = T)
+dgm_vis$network
+
+```
+
+
+
+
