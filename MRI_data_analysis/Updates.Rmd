@@ -17,12 +17,32 @@ save(data, file = 'raw.rda')
 ```
 
 
-
+# type 1 level 1
 ```{r}
 # note function spreadROIs() doesn't work very well
 # data = readFileList(fileList = file_list,fixBF = TRUE) %>% spreadROIs()
+
 rm(list = ls())
 load(file = 'raw.rda')
+
+data = data %>% filter(type==1,level==1) %>%
+  select(rawid,roi,volume) %>% spread(roi,volume)
+
+# convert the rawid to be compatible with the format in lookup table
+data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
+
+# compositional analysis
+data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
+data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+
+cor_matrix = cor(data[-1])
+library(corrplot)
+corrplot(cor_matrix,type = 'upper')
+
+
+det(cor_matrix)
+library(matlib)
+inv_cor_matrix = inv(cor_matrix)
 
 
 
