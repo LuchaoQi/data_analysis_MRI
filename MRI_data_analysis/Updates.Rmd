@@ -43,8 +43,7 @@ corrplot(cor_matrix,type = 'upper')
 det(cor_matrix)
 library(matlib)
 inv_cor_matrix = inv(cor_matrix)
-
-
+inv_cor_matrix = Ginv(cor_matrix)
 
 
 ```
