@@ -35,15 +35,13 @@ data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
 data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
 data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 
-cor_matrix = cor(data[-1])
-library(corrplot)
-corrplot(cor_matrix,type = 'upper')
+cov_matrix = cov(data[-1])
 
 
-det(cor_matrix)
+det(cov_matrix)
 library(matlib)
-inv_cor_matrix = inv(cor_matrix)
-inv_cor_matrix = Ginv(cor_matrix)
+inv_cor_matrix = inv(cov_matrix)
+inv_cor_matrix = Ginv(cov_matrix)
 
 
 ```
