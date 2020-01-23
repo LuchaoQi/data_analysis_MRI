@@ -19,13 +19,27 @@ save(data, file = 'raw.rda')
 
 
 ```{r}
+# note function spreadROIs() doesn't work very well
+# data = readFileList(fileList = file_list,fixBF = TRUE) %>% spreadROIs()
 rm(list = ls())
 load(file = 'raw.rda')
-load(file = 'data.Rdata')
+
 
 
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 file.sources = list.files(c("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/muvis"), 
