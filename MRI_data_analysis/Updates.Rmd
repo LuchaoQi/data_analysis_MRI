@@ -21,7 +21,7 @@ save(data, file = 'raw.rda')
 ```{r}
 rm(list = ls())
 load(file = 'raw.rda')
-
+load(file = 'data.Rdata')
 
 
 
