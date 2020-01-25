@@ -41,9 +41,10 @@ cov_matrix = cov(data[-1])
 det(cov_matrix)
 library(matlib)
 inv_cov_matrix = inv(cov_matrix)
-inv_cov_matrix = Ginv(cov_matrix)
+inv_cov_matrix = Ginv(cov_matrix,fractions = FALSE)
+library(pracma)
 
-
+inv_matrix = Pinv(cov_matrix)
 ```
 
 
