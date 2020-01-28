@@ -79,6 +79,7 @@ new_dgm <- induced.subgraph(nhanes_dgm$graph, V(nhanes_dgm$graph)[which(grph_clu
 
 # Visualize the graph
 dgm_vis <- graph_vis(new_dgm, plot = F, directed = T)
+dgm_vis <- graph_vis(nhanes_dgm$graph, plot = F, directed = T)
 dgm_vis$network
 
 ```
