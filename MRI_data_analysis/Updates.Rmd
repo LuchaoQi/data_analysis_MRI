@@ -25,8 +25,8 @@ save(data, file = 'raw.rda')
 rm(list = ls())
 load(file = 'raw.rda')
 
-data = data %>% filter(type==1,level==1) %>%
-  select(rawid,roi,volume) %>% spread(roi,volume)
+data = data %>% filter(type==1,level==1) %>% 
+  select(rawid,roi,volume) %>% spread(roi,volume) 
 
 # convert the rawid to be compatible with the format in lookup table
 data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
@@ -53,6 +53,15 @@ inv_matrix = Pinv(cov_matrix)
 # determinant close to 0
 
 ```{r}
+library(ggm)
+
+glasso_ggm <- ggm(data = data, methods = c("glasso"), levels = 15)
+
+## Using preprocessed data
+data <- data_preproc(NHANES, levels = 15)
+data$SEQN <- NULL
+glasso_sin_ggm <- ggm(data, methods = c("glasso", "sin"),
+plot = TRUE, rho = 0.2, significance = 0.03)
 
 ```
 
@@ -63,6 +72,7 @@ inv_matrix = Pinv(cov_matrix)
 
 
 
+# Weighted Covariance Matrices
 
 ```{r}
 file.sources = list.files(c("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/muvis"), 
