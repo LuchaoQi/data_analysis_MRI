@@ -34,8 +34,10 @@ data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
 # compositional analysis
 data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
 data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+data = data[-1]
 
-cov_matrix = cov(data[-1])
+
+cov_matrix = cov(data)
 
 
 det(cov_matrix)
@@ -50,6 +52,9 @@ inv_matrix = Pinv(cov_matrix)
 
 # determinant close to 0
 
+```{r}
+
+```
 
 
 
