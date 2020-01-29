@@ -53,15 +53,9 @@ inv_matrix = Pinv(cov_matrix)
 # determinant close to 0
 
 ```{r}
-library(ggm)
+library(glasso)
 
-glasso_ggm <- ggm(data = data, methods = c("glasso"), levels = 15)
 
-## Using preprocessed data
-data <- data_preproc(NHANES, levels = 15)
-data$SEQN <- NULL
-glasso_sin_ggm <- ggm(data, methods = c("glasso", "sin"),
-plot = TRUE, rho = 0.2, significance = 0.03)
 
 ```
 
