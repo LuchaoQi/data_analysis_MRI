@@ -38,15 +38,13 @@ data = data[-1]
 
 
 cov_matrix = cov(data)
-
-
 det(cov_matrix)
-library(matlib)
-inv_cov_matrix = inv(cov_matrix)
-inv_cov_matrix = Ginv(cov_matrix)
-library(pracma)
-
-inv_matrix = Pinv(cov_matrix)
+# library(matlib)
+# inv_cov_matrix = inv(cov_matrix)
+# inv_cov_matrix = Ginv(cov_matrix)
+# library(pracma)
+# 
+# inv_matrix = Pinv(cov_matrix)
 ```
 
 
