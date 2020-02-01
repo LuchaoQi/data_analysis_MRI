@@ -8,8 +8,9 @@ library(MRIcloudT1volumetrics)
 roiDir = paste0(getwd(),'/data')
 file_list = dir(roiDir)
 # readSubjectDf(file_list[1])$level
-# setwd("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/data")
+
 # run it in console
+# setwd("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/data")
 data = readFileList(fileList = file_list,fixBF = TRUE)
 save(data, file = 'raw.rda')
 
