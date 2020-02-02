@@ -38,23 +38,21 @@ data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 data = data[-1]
 
 
-cov_matrix = cov(data)
-det(cov_matrix)
-# library(matlib)
-# inv_cov_matrix = inv(cov_matrix)
-# inv_cov_matrix = Ginv(cov_matrix)
-# library(pracma)
-# 
-# inv_matrix = Pinv(cov_matrix)
 ```
 
 
-# determinant close to 0
+# determinant of concentration matrix close to 0
+# the matrix is not positive definite ~ singular
 
 ```{r}
 library(glasso)
-
-
+library(qgraph)
+s = glasso(cor(data),rho = 0.01)
+qgraph(s,
+       labels = colnames(cor(data)),
+       # filetype = 'pdf',
+       details = TRUE,
+       directed = TRUE)
 
 ```
 
@@ -65,6 +63,26 @@ library(glasso)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# garbage code
 # Weighted Covariance Matrices
 
 ```{r}
