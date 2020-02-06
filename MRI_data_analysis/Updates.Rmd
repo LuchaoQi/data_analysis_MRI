@@ -66,27 +66,26 @@ qgraph(t,
 ```
 
 
+
+
+
 ```{r}
-library(glasso)
-library(qgraph)
-# s = glasso(cor(data),rho = 0.1)
-# qgraph(s,
-#        labels = colnames(cor(data)),
-#        # filetype = 'pdf',
-#        details = TRUE,
-#        directed = TRUE)
-
-
-lapply(seq(0,0.5,0.1), function(i){
-  s = glasso(cor(data),rho = i)
-  qgraph(s,
-       labels = colnames(cor(data)),
-       # filetype = 'pdf',
-       # filename = paste0('rho=',i),
-       details = TRUE,
-       directed = TRUE)
+library(corrplot)
+corrplot(cor(data),
+         # addCoef.col = T,
+         method = 'color',
+         type = 'upper',
+         order = 'hclust',
+         p.mat = cor.mtest(data, conf.level = .95)$p
+         )
+# interesting results of Telencephalon
+library(randomForest)
+lapply(colnames(data), function(i){
+  fml = paste0(i,"~.-",i) %>% as.formula()
+  data.rf = randomForest(fml, data, importance = TRUE)
+  varImpPlot(data.rf,
+             main = i)
 })
-
 ```
 
 
@@ -116,9 +115,34 @@ lapply(seq(0,0.5,0.1), function(i){
 
 
 # garbage code
-# Weighted Covariance Matrices
 
-```{r, eval = FALSE, include=FALSE}
+```{r,eval=F}
+library(glasso)
+library(qgraph)
+# s = glasso(cor(data),rho = 0.1)
+# qgraph(s,
+#        labels = colnames(cor(data)),
+#        # filetype = 'pdf',
+#        details = TRUE,
+#        directed = TRUE)
+
+
+lapply(seq(0,0.5,0.1), function(i){
+  s = glasso(cor(data),rho = i)
+  qgraph(s,
+       labels = colnames(cor(data)),
+       # filetype = 'pdf',
+       # filename = paste0('rho=',i),
+       details = TRUE,
+       directed = TRUE)
+})
+
+```
+
+
+
+
+```{r, eval = FALSE}
 file.sources = list.files(c("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/muvis"), 
                           pattern="*.R$", full.names=TRUE, 
                           ignore.case=TRUE)
