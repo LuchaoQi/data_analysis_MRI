@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r, eval=F,include=F}
@@ -57,12 +57,15 @@ data = data[-1]
 library(glasso)
 library(qgraph)
 
-t = glasso(cov(data),rho = 0)
-qgraph(t,
+lapply(seq(0,0.3,0.1), function(i){
+  s = glasso(cov(data),rho = i)
+  qgraph(s,
        labels = colnames(cov(data)),
+       # filetype = 'pdf',
+       # filename = paste0('rho=',i),
        details = TRUE,
        directed = TRUE)
-
+})
 ```
 
 
