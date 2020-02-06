@@ -34,7 +34,7 @@ library(MRIcloudT1volumetrics)
 
 load(file = 'raw.rda')
 
-data = data %>% filter(type==1,level==1) %>% 
+data = data %>% filter(type==1,level==2) %>% 
   select(rawid,roi,volume) %>% spread(roi,volume) 
 
 # convert the rawid to be compatible with the format in lookup table
