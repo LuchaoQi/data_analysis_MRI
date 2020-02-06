@@ -52,6 +52,18 @@ data = data[-1]
 # determinant of concentration matrix close to 0
 # the matrix is not positive definite ~ singular
 
+
+```{r}
+library(glasso)
+library(qgraph)
+t = glasso(cov(data),rho = 0.01)
+qgraph(t,
+       labels = colnames(cov(data)),
+       details = TRUE,
+       directed = TRUE)
+```
+
+
 ```{r}
 library(glasso)
 library(qgraph)
