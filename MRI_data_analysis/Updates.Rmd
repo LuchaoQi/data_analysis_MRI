@@ -34,7 +34,7 @@ library(MRIcloudT1volumetrics)
 
 load(file = 'raw.rda')
 
-data = data %>% filter(type==1,level==2) %>% 
+data = data %>% filter(type==1,level==1) %>% 
   select(rawid,roi,volume) %>% spread(roi,volume) 
 
 # convert the rawid to be compatible with the format in lookup table
@@ -57,7 +57,7 @@ data = data[-1]
 library(glasso)
 library(qgraph)
 
-lapply(seq(0,0.3,0.1), function(i){
+lapply(seq(0,0.2,0.1), function(i){
   s = glasso(cov(data),rho = i)
   qgraph(s,
        labels = colnames(cov(data)),
@@ -66,6 +66,8 @@ lapply(seq(0,0.3,0.1), function(i){
        details = TRUE,
        directed = TRUE)
 })
+
+
 ```
 
 
@@ -117,9 +119,8 @@ lapply(colnames(data), function(i){
 
 
 
-# garbage code
 
-```{r,eval=F}
+```{r}
 library(glasso)
 library(qgraph)
 # s = glasso(cor(data),rho = 0.1)
@@ -143,6 +144,7 @@ lapply(seq(0,0.5,0.1), function(i){
 ```
 
 
+# garbage code
 
 
 ```{r, eval = FALSE}
