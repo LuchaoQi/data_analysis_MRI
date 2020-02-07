@@ -57,7 +57,7 @@ data = data[-1]
 library(glasso)
 library(qgraph)
 
-lapply(seq(0,0.2,0.1), function(i){
+lapply(seq(0,0.0001,0.00001), function(i){
   s = glasso(cov(data),rho = i)
   qgraph(s,
        labels = colnames(cov(data)),
