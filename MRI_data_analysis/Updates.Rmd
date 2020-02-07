@@ -66,7 +66,8 @@ lapply(seq(0,0.0001,0.00001), function(i){
        details = TRUE,
        directed = TRUE)
 })
-
+library(gridExtra)
+# do.call(grid.arrange,c(gs,nrow = 3))
 
 ```
 
