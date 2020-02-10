@@ -15,11 +15,6 @@
 
 * Multinomial prediction `multinom` on Age based on `PC scores`
 
-  ```R
-  PCA$x #loadings
-  PCA$rotations #a matrix whose columns contain the eigenvectors
-  ```
-
 * Low ACC still need to be solved
 
 ---
