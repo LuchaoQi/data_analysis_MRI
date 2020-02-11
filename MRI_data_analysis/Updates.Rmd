@@ -34,7 +34,7 @@ library(MRIcloudT1volumetrics)
 
 load(file = 'raw.rda')
 if(T){
-data = data %>% filter(type==1,level==1) %>% 
+data = data %>% filter(type==1,level==2) %>% 
   select(rawid,roi,volume) %>% spread(roi,volume) 
 
 # convert the rawid to be compatible with the format in lookup table
@@ -46,6 +46,8 @@ data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 data = data[-1]
 }
 
+# get rid of CSF
+data = data %>% select(-c(Ventricle))
 ```
 
 
@@ -58,7 +60,7 @@ library(glasso)
 library(qgraph)
 
 
-gs = lapply(seq(0,0.00005,0.00001), function(i){
+gs = lapply(seq(0,0.00003,0.000005), function(i){
   qgraph(glasso(cov(data),rho = i),
        labels = colnames(cov(data)),
        # filetype = 'pdf',
@@ -120,34 +122,6 @@ lapply(colnames(data), function(i){
 
 
 
-
-
-
-
-
-
-```{r}
-library(glasso)
-library(qgraph)
-# s = glasso(cor(data),rho = 0.1)
-# qgraph(s,
-#        labels = colnames(cor(data)),
-#        # filetype = 'pdf',
-#        details = TRUE,
-#        directed = TRUE)
-
-
-lapply(seq(0,0.5,0.1), function(i){
-  s = glasso(cor(data),rho = i)
-  qgraph(s,
-       labels = colnames(cor(data)),
-       # filetype = 'pdf',
-       # filename = paste0('rho=',i),
-       details = TRUE,
-       directed = TRUE)
-})
-
-```
 
 
 # garbage code
