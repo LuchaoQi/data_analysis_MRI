@@ -47,7 +47,8 @@ data = data[-1]
 }
 
 # get rid of CSF
-data = data %>% select(-c(Ventricle))
+data = data %>% select(-Ventricle)
+
 ```
 
 
@@ -60,7 +61,7 @@ library(glasso)
 library(qgraph)
 
 
-gs = lapply(seq(0,0.00003,0.000005), function(i){
+gs = lapply(seq(0,0.00002,0.000005), function(i){
   qgraph(glasso(cov(data),rho = i),
        labels = colnames(cov(data)),
        # filetype = 'pdf',
@@ -78,6 +79,22 @@ gs = lapply(seq(0,0.00003,0.000005), function(i){
 ```
 
 
+```{r}
+# only Telencephalon
+data = data %>% select(CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
+                        CerebralCortex_R,CerebralNucli_R,WhiteMatter_R,)
+
+gs = lapply(seq(0,0.00003,0.000005), function(i){
+  qgraph(glasso(cov(data),rho = i),
+       labels = colnames(cov(data)),
+       # filetype = 'pdf',
+       # filename = paste0('rho=',i),
+       # layout = matrix(1:12,nrow = 4),
+       # DoNotPlot = TRUE,
+       details = TRUE,
+       directed = TRUE)
+})
+```
 
 
 
