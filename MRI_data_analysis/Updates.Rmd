@@ -33,7 +33,7 @@ library(tidyverse)
 library(MRIcloudT1volumetrics)
 
 load(file = 'raw.rda')
-if(T){
+
 data = data %>% filter(type==1,level==2) %>% 
   select(rawid,roi,volume) %>% spread(roi,volume) 
 
@@ -41,48 +41,33 @@ data = data %>% filter(type==1,level==2) %>%
 data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
 
 # compositional analysis
-data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
-data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
-data = data[-1]
-}
+# data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
+# data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+# data = data[-1]
+
 
 # get rid of CSF
-data = data %>% select(-Ventricle)
+# data = data %>% select(-Ventricle)
 
 ```
 
 
-# determinant of concentration matrix close to 0
-# the matrix is not positive definite ~ singular
+
 
 
 ```{r}
 library(glasso)
 library(qgraph)
 
-
-gs = lapply(seq(0,0.00002,0.000005), function(i){
-  qgraph(glasso(cov(data),rho = i),
-       labels = colnames(cov(data)),
-       # filetype = 'pdf',
-       # filename = paste0('rho=',i),
-       # layout = matrix(1:12,nrow = 4),
-       # DoNotPlot = TRUE,
-       details = TRUE,
-       directed = TRUE)
-})
-# layout(matrix(c(1:6),2,3,byrow =TRUE))
-# # layout.show()
-# plot(gs[[1]])
-# plot(gs[[2]])
-# lapply(gs, plot)
-```
-
-
-```{r}
 # only Telencephalon
-data = data %>% select(CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
+data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
                         CerebralCortex_R,CerebralNucli_R,WhiteMatter_R,)
+
+# compositional analysis
+
+# data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
+data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+data = data[-1]
 
 gs = lapply(seq(0,0.00003,0.000005), function(i){
   qgraph(glasso(cov(data),rho = i),
@@ -121,8 +106,11 @@ lapply(colnames(data), function(i){
 
 
 
+# permutation test
 
+```{r}
 
+```
 
 
 
@@ -142,6 +130,33 @@ lapply(colnames(data), function(i){
 
 
 # garbage code
+
+
+# determinant of concentration matrix close to 0
+# the matrix is not positive definite ~ singular
+
+
+```{r,eval=F,include=F}
+library(glasso)
+library(qgraph)
+
+
+gs = lapply(seq(0,0.00002,0.000005), function(i){
+  qgraph(glasso(cov(data),rho = i),
+       labels = colnames(cov(data)),
+       # filetype = 'pdf',
+       # filename = paste0('rho=',i),
+       # layout = matrix(1:12,nrow = 4),
+       # DoNotPlot = TRUE,
+       details = TRUE,
+       directed = TRUE)
+})
+# layout(matrix(c(1:6),2,3,byrow =TRUE))
+# # layout.show()
+# plot(gs[[1]])
+# plot(gs[[2]])
+# lapply(gs, plot)
+```
 
 
 ```{r, eval = FALSE}
