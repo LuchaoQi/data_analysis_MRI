@@ -68,6 +68,29 @@ data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
 # data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
 data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 data = data[-1]
+```
+
+# normalization
+```{r}
+library(ggplot2)
+
+
+ggplot(gather(data), aes(value)) + 
+    geom_histogram(bins = 10) + 
+    facet_wrap(~key, scales = 'free_x')
+
+data = lapply(data, function(i){
+  scale(i)
+}) %>% do.call(what = 'cbind') %>% as.data.frame()
+colnames(data) = colnames(data)
+
+
+ggplot(gather(data), aes(value)) + 
+    geom_histogram(bins = 10) + 
+    facet_wrap(~key, scales = 'free_x')
+```
+
+```{r}
 
 gs = lapply(seq(0,0.00003,0.000005), function(i){
   qgraph(glasso(cov(data),rho = i),
