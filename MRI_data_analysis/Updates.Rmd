@@ -79,11 +79,7 @@ ggplot(gather(data), aes(value)) +
     geom_histogram(bins = 10) + 
     facet_wrap(~key, scales = 'free_x')
 
-data = lapply(data, function(i){
-  scale(i)
-}) %>% do.call(what = 'cbind') %>% as.data.frame()
-colnames(data) = colnames(data)
-
+data = apply(data, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
 
 ggplot(gather(data), aes(value)) + 
     geom_histogram(bins = 10) + 
@@ -92,7 +88,7 @@ ggplot(gather(data), aes(value)) +
 
 ```{r}
 
-gs = lapply(seq(0,0.00003,0.000005), function(i){
+gs = lapply(seq(0,0.1,0.02), function(i){
   qgraph(glasso(cov(data),rho = i),
        labels = colnames(cov(data)),
        # filetype = 'pdf',
