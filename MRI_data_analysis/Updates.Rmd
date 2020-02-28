@@ -54,10 +54,9 @@ data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
 
 
 
-
+# compositional analysis
 ```{r}
-library(glasso)
-library(qgraph)
+
 
 # only Telencephalon
 data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
@@ -88,7 +87,8 @@ ggplot(gather(data), aes(value)) +
 ```
 
 ```{r}
-
+library(glasso)
+library(qgraph)
 gs = lapply(seq(0,0.1,0.02), function(i){
   qgraph(glasso(cov(data),rho = i),
        labels = colnames(cov(data)),
@@ -148,13 +148,21 @@ test = function(x,y){
   mean(data[1:l1]) - mean(data[l1:(l1+l2)])
 }
 
-res = lapply(2:7, function(i){
+perm_res = lapply(2:7, function(i){
   tr_diff = mean(data_M[i] %>% unlist ) - mean(data_F[i] %>% unlist)
   re_diff = replicate(2000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
   p_value = mean(abs(re_diff)>=abs(tr_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
-colnames(res) = colnames(data)[2:7]
+colnames(perm_res) = colnames(data)[2:7]
 
+perm_res
+
+t_res = lapply(2:7, function(i){
+  p_value = t.test(data_M[i]%>%unlist, data_F[i] %>% unlist)$p.value
+}) %>% do.call(what='cbind') %>% as.data.frame()
+colnames(t_res) = colnames(data)[2:7]
+
+t_res
 ```
 
 
