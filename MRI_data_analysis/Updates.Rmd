@@ -66,6 +66,7 @@ data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
 # compositional analysis
 
 # data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
+id = data[1]
 data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 data = data[-1]
 ```
@@ -128,6 +129,31 @@ lapply(colnames(data), function(i){
 # permutation test
 
 ```{r}
+data = data.frame(id,data)
+ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+colnames(ref)[1] = 'rawid'
+
+data[1] = as.numeric(unlist(data[1]))
+data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+
+data_M = filter(data,Gender == 'M')
+data_F = filter(data,Gender == 'F')
+
+
+
+test = function(x,y){
+  l1 = length(x)
+  l2 = length(y)
+  data = sample(c(x,y),replace = T)
+  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
+}
+
+res = lapply(2:7, function(i){
+  tr_diff = mean(data_M[i] %>% unlist ) - mean(data_F[i] %>% unlist)
+  re_diff = replicate(2000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
+  p_value = mean(abs(re_diff)>=abs(tr_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+colnames(res) = colnames(data)[2:7]
 
 ```
 
