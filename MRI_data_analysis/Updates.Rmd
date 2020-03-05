@@ -200,7 +200,7 @@ for(j in 1:dim(vec)[1]){
   age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
 }
 
-age_res
+# age_res
 do.call(rbind.data.frame, age_res)
 
 # cerebralcortex and whitematter change across age
