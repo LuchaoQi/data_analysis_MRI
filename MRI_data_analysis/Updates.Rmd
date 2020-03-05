@@ -148,14 +148,14 @@ test = function(x,y){
   mean(data[1:l1]) - mean(data[l1:(l1+l2)])
 }
 
-perm_res = lapply(2:7, function(i){
+sex_res = lapply(2:7, function(i){
   tr_diff = mean(data_M[i] %>% unlist ) - mean(data_F[i] %>% unlist)
   re_diff = replicate(2000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
   p_value = mean(abs(re_diff)>=abs(tr_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
-colnames(perm_res) = colnames(data)[2:7]
+colnames(sex_res) = colnames(data)[2:7]
 
-perm_res
+sex_res
 
 t_res = lapply(2:7, function(i){
   p_value = t.test(data_M[i]%>%unlist, data_F[i] %>% unlist)$p.value
@@ -170,6 +170,41 @@ t_res
 
 
 
+```{r}
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+data36 = data %>% filter(Age == '36+')
+  
+library(gtools)
+vec = combinations(4,2,c('data22','data26','data31','data36'))
+age_res = list()
+
+
+test = function(x,y){
+  l1 = length(x)
+  l2 = length(y)
+  data = sample(c(x,y),replace = T)
+  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
+}
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(2:7, function(i){
+  tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
+  re_diff = replicate(2000, test(data1[i] %>% unlist, data2[i] %>% unlist))
+  p_value = mean(abs(re_diff)>=abs(tr_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  colnames(perm_res) = colnames(data)[2:7]
+  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+age_res
+do.call(rbind.data.frame, age_res)
+
+# cerebralcortex and whitematter change across age
+```
 
 
 
