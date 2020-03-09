@@ -211,6 +211,18 @@ do.call(rbind.data.frame, age_res)
 # Does spearman correlation change across age?
 
 
+```{r}
+library(ggcorrplot)
+vec = list('data22','data26','data31','data36')
+lapply(vec, function(i){
+  data = get(i) %>% select(-rawid,-Age,-Gender)
+  ggcorrplot(cor(data, method = 'spearman'), 
+             hc.order = TRUE,
+             type = "lower",
+             p.mat = cor_pmat(data),
+             title = i)
+})
+```
 
 
 
