@@ -56,8 +56,6 @@ data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
 
 # compositional analysis
 ```{r}
-
-
 # only Telencephalon
 data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
                         CerebralCortex_R,CerebralNucli_R,WhiteMatter_R,)
@@ -69,6 +67,9 @@ id = data[1]
 data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
 data = data[-1]
 ```
+
+
+
 
 # normalization
 ```{r}
@@ -84,6 +85,9 @@ data = apply(data, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame(
 ggplot(gather(data), aes(value)) + 
     geom_histogram(bins = 10) + 
     facet_wrap(~key, scales = 'free_x')
+
+
+
 ```
 
 ```{r}
@@ -105,7 +109,7 @@ gs = lapply(seq(0,0.1,0.02), function(i){
 
 ```{r}
 library(corrplot)
-corrplot(cor(data),
+corrplot(cor(data, method = 'spearman'),
          # addCoef.col = T,
          method = 'color',
          type = 'upper',
@@ -150,19 +154,44 @@ test = function(x,y){
 
 sex_res = lapply(2:7, function(i){
   tr_diff = mean(data_M[i] %>% unlist ) - mean(data_F[i] %>% unlist)
-  re_diff = replicate(2000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
+  re_diff = replicate(1000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
   p_value = mean(abs(re_diff)>=abs(tr_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
 colnames(sex_res) = colnames(data)[2:7]
 
 sex_res
 
-t_res = lapply(2:7, function(i){
-  p_value = t.test(data_M[i]%>%unlist, data_F[i] %>% unlist)$p.value
-}) %>% do.call(what='cbind') %>% as.data.frame()
-colnames(t_res) = colnames(data)[2:7]
+# t_res = lapply(2:7, function(i){
+#   p_value = t.test(data_M[i]%>%unlist, data_F[i] %>% unlist)$p.value
+# }) %>% do.call(what='cbind') %>% as.data.frame()
+# colnames(t_res) = colnames(data)[2:7]
+# 
+# t_res
 
-t_res
+
+data22_M = data_M %>% filter(Age == '22-25')
+data26_M = data_M %>% filter(Age == '26-30')
+data31_M = data_M %>% filter(Age == '31-35')
+data36_M = data_M %>% filter(Age == '36+')
+
+data22_F = data_F %>% filter(Age == '22-25')
+data26_F = data_F %>% filter(Age == '26-30')
+data31_F = data_F %>% filter(Age == '31-35')
+data36_F = data_F %>% filter(Age == '36+')
+
+library(ggcorrplot)
+vec = list('data22_M','data22_F','data26_M','data26_F','data31_M','data31_F','data36_M',
+           'data36_F')
+lapply(vec, function(i){
+  data = get(i) %>% select(-rawid,-Age,-Gender)
+  ggcorrplot(cor(data, method = 'spearman'), 
+             hc.order = TRUE,
+             type = "lower",
+             p.mat = cor_pmat(data),
+             lab = TRUE,
+             title = i)
+})
+
 ```
 
 
@@ -193,7 +222,7 @@ for(j in 1:dim(vec)[1]){
   data2 = get(vec[j,2])
   perm_res = lapply(2:7, function(i){
   tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
-  re_diff = replicate(2000, test(data1[i] %>% unlist, data2[i] %>% unlist))
+  re_diff = replicate(1000, test(data1[i] %>% unlist, data2[i] %>% unlist))
   p_value = mean(abs(re_diff)>=abs(tr_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = colnames(data)[2:7]
@@ -201,8 +230,8 @@ for(j in 1:dim(vec)[1]){
 }
 
 # age_res
-do.call(rbind.data.frame, age_res)
-
+age_res = do.call(rbind.data.frame, age_res)
+age_res[c('data22data26','data26data31','data31data36'),]
 # cerebralcortex and whitematter change across age
 ```
 
@@ -220,11 +249,70 @@ lapply(vec, function(i){
              hc.order = TRUE,
              type = "lower",
              p.mat = cor_pmat(data),
+             lab = TRUE,
              title = i)
 })
 ```
 
 
+
+
+# mutate combine L and R together
+
+```{r}
+
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+load(file = 'raw.rda')
+
+data = data %>% filter(type==1,level==2) %>% 
+  select(rawid,roi,volume) %>% spread(roi,volume) 
+
+# convert the rawid to be compatible with the format in lookup table
+data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
+
+
+# only Telencephalon
+data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
+                        CerebralCortex_R,CerebralNucli_R,WhiteMatter_R,)
+
+# compositional analysis
+
+# data = data %>% lapply(function(x) as.numeric(x)) %>% as.data.frame
+id = data[1]
+data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+data = data[-1]
+data = apply(data, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
+
+data_mutate = data %>% mutate(CerebralCortex = CerebralCortex_L + CerebralCortex_R) %>% mutate(CerebralNucli = CerebralNucli_L + CerebralCortex_R) %>% mutate(WhiteMatter = WhiteMatter_L + WhiteMatter_R) %>% select(CerebralCortex,CerebralNucli,WhiteMatter)
+
+data_mutate = apply(data_mutate, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
+
+data_mutate = data.frame(id,data_mutate)
+ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+colnames(ref)[1] = 'rawid'
+
+data_mutate[1] = as.numeric(unlist(data_mutate[1]))
+data_mutate = left_join(data_mutate, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+
+
+data22 = data_mutate %>% filter(Age == '22-25')
+data26 = data_mutate %>% filter(Age == '26-30')
+data31 = data_mutate %>% filter(Age == '31-35')
+data36 = data_mutate %>% filter(Age == '36+')
+  
+library(ggcorrplot)
+vec = list('data22','data26','data31','data36')
+lapply(vec, function(i){
+  data = get(i) %>% select(-rawid,-Age,-Gender)
+  ggcorrplot(cor(data, method = 'spearman'), 
+             hc.order = TRUE,
+             type = "lower",
+             p.mat = cor_pmat(data),
+             title = i)
+})
+```
 
 
 
