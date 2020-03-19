@@ -130,7 +130,54 @@ lapply(colnames(data), function(i){
 
 
 
+
+
+
+
+
+
 # permutation test
+
+```{r}
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+data36 = data %>% filter(Age == '36+')
+  
+library(gtools)
+vec = combinations(4,2,c('data22','data26','data31','data36'))
+age_res = list()
+
+
+test = function(x,y){
+  l1 = length(x)
+  l2 = length(y)
+  data = sample(c(x,y),replace = T)
+  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
+}
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(2:7, function(i){
+  tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
+  re_diff = replicate(1000, test(data1[i] %>% unlist, data2[i] %>% unlist))
+  p_value = mean(abs(re_diff)>=abs(tr_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  colnames(perm_res) = colnames(data)[2:7]
+  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+# age_res
+age_res = do.call(rbind.data.frame, age_res)
+age_res[c('data22data26','data26data31','data31data36'),]
+# cerebralcortex and whitematter change across age
+```
+
+
+
+
+# cor res_detailed
 
 ```{r}
 data = data.frame(id,data)
@@ -194,49 +241,6 @@ lapply(vec, function(i){
 
 ```
 
-
-
-
-
-
-```{r}
-data22 = data %>% filter(Age == '22-25')
-data26 = data %>% filter(Age == '26-30')
-data31 = data %>% filter(Age == '31-35')
-data36 = data %>% filter(Age == '36+')
-  
-library(gtools)
-vec = combinations(4,2,c('data22','data26','data31','data36'))
-age_res = list()
-
-
-test = function(x,y){
-  l1 = length(x)
-  l2 = length(y)
-  data = sample(c(x,y),replace = T)
-  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
-}
-
-for(j in 1:dim(vec)[1]){
-  data1 = get(vec[j,1])
-  data2 = get(vec[j,2])
-  perm_res = lapply(2:7, function(i){
-  tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
-  re_diff = replicate(1000, test(data1[i] %>% unlist, data2[i] %>% unlist))
-  p_value = mean(abs(re_diff)>=abs(tr_diff))
-}) %>% do.call(what='cbind') %>% as.data.frame()
-  colnames(perm_res) = colnames(data)[2:7]
-  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
-}
-
-# age_res
-age_res = do.call(rbind.data.frame, age_res)
-age_res[c('data22data26','data26data31','data31data36'),]
-# cerebralcortex and whitematter change across age
-```
-
-
-
 # Does spearman correlation change across age?
 
 
@@ -256,12 +260,15 @@ lapply(vec, function(i){
 
 # regression model
 ```{r}
-lapply(colnames(data), function(i){
+regression_res = list()
+
+for (i in colnames(data)) {
   fml = paste0(i,"~.") %>% as.formula()
   model = glm(fml, family = gaussian, data = data)
-  summary(model)
-})
+  regression_res[[i]] = model
+}
 
+lapply(regression_res,summary)
 ```
 
 
