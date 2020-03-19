@@ -254,6 +254,15 @@ lapply(vec, function(i){
 })
 ```
 
+# regression model
+```{r}
+lapply(colnames(data), function(i){
+  fml = paste0(i,"~.") %>% as.formula()
+  model = glm(fml, family = gaussian, data = data)
+  summary(model)
+})
+
+```
 
 
 
