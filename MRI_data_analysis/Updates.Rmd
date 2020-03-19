@@ -136,43 +136,6 @@ lapply(colnames(data), function(i){
 
 
 
-# permutation test
-
-```{r}
-data22 = data %>% filter(Age == '22-25')
-data26 = data %>% filter(Age == '26-30')
-data31 = data %>% filter(Age == '31-35')
-data36 = data %>% filter(Age == '36+')
-  
-library(gtools)
-vec = combinations(4,2,c('data22','data26','data31','data36'))
-age_res = list()
-
-
-test = function(x,y){
-  l1 = length(x)
-  l2 = length(y)
-  data = sample(c(x,y),replace = T)
-  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
-}
-
-for(j in 1:dim(vec)[1]){
-  data1 = get(vec[j,1])
-  data2 = get(vec[j,2])
-  perm_res = lapply(2:7, function(i){
-  tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
-  re_diff = replicate(1000, test(data1[i] %>% unlist, data2[i] %>% unlist))
-  p_value = mean(abs(re_diff)>=abs(tr_diff))
-}) %>% do.call(what='cbind') %>% as.data.frame()
-  colnames(perm_res) = colnames(data)[2:7]
-  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
-}
-
-# age_res
-age_res = do.call(rbind.data.frame, age_res)
-age_res[c('data22data26','data26data31','data31data36'),]
-# cerebralcortex and whitematter change across age
-```
 
 
 
@@ -187,6 +150,7 @@ colnames(ref)[1] = 'rawid'
 data[1] = as.numeric(unlist(data[1]))
 data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
 
+save(data,file = 'data.Rda')
 data_M = filter(data,Gender == 'M')
 data_F = filter(data,Gender == 'F')
 
@@ -245,6 +209,10 @@ lapply(vec, function(i){
 
 
 ```{r}
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+data36 = data %>% filter(Age == '36+') 
 library(ggcorrplot)
 vec = list('data22','data26','data31','data36')
 lapply(vec, function(i){
@@ -260,11 +228,13 @@ lapply(vec, function(i){
 
 # regression model
 ```{r}
+regression_data = data %>% select(-rawid)
+# regression_data = data %>% select(-rawid,-Age,-Gender)
 regression_res = list()
 
-for (i in colnames(data)) {
+for (i in colnames(regression_data)[1:6]) {
   fml = paste0(i,"~.") %>% as.formula()
-  model = glm(fml, family = gaussian, data = data)
+  model = glm(fml, family = gaussian, data = regression_data)
   regression_res[[i]] = model
 }
 
@@ -272,10 +242,55 @@ lapply(regression_res,summary)
 ```
 
 
+# permutation test(not the mean, cor efficients)
+
+```{r}
+load(file = 'data.Rda')
+# data = data %>% select(-rawid,-Gender)
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+data36 = data %>% filter(Age == '36+')
+
+library(gtools)
+vec = combinations(4,2,c('data22','data26','data31','data36'))
+age_res = list()
+
+
+test = function(x,y){
+  l1 = length(x)
+  l2 = length(y)
+  data = sample(c(x,y),replace = T)
+  cor(data[1:l1])
+  mean(data[1:l1]) - mean(data[l1:(l1+l2)])
+}
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(2:7, function(i){
+  tr_diff = mean(data1[i] %>% unlist ) - mean(data2[i] %>% unlist)
+  re_diff = replicate(1000, test(data1[i] %>% unlist, data2[i] %>% unlist))
+  p_value = mean(abs(re_diff)>=abs(tr_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  colnames(perm_res) = colnames(data)[2:7]
+  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+# age_res
+age_res = do.call(rbind.data.frame, age_res)
+age_res[c('data22data26','data26data31','data31data36'),]
+# cerebralcortex and whitematter change across age
+```
+
+
+
+
+# garbage code
 
 # mutate combine L and R together
 
-```{r}
+```{r, eval = F, include=F}
 
 library(tidyverse)
 library(MRIcloudT1volumetrics)
@@ -326,16 +341,10 @@ lapply(vec, function(i){
              hc.order = TRUE,
              type = "lower",
              p.mat = cor_pmat(data),
-             title = i)
+             title = i,
+             lab = TRUE)
 })
 ```
-
-
-
-
-
-# garbage code
-
 
 # determinant of concentration matrix close to 0
 # the matrix is not positive definite ~ singular
