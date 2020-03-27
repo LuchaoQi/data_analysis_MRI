@@ -296,6 +296,12 @@ which(age_res <= 0.05, arr.ind = TRUE)
 # apply(which(age_res <= 0.05, arr.ind = TRUE), MARGIN = 1, FUN = function(i){
 #   c(rownames(age_res)[i[1]], colnames(age_res)[i[2]])
 # }) %>% view()
+
+
+# data26data31   4  14
+# > colnames(age_res)[14]
+# [1] "CerebralNucli_R WhiteMatter_R"
+
 ```
 
 
