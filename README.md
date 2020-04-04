@@ -21,17 +21,38 @@
 
 1/10/2020
 
-Updates
+**Updates**
 
-> We want to find the most predictable region and the most important variable to investigate associations b/w ROIs
+**Goal**
 
-Method
+We want to find the most predictable region and the most important variable to investigate associations b/w ROIs
 
-> conditional independence graph ~ volumetric MRI
->
-> - Differ across age/gender
-> - Sparse version
->
-> Gaussian lasso
->
-> Lasso regression/ Elastic net
+**Method**
+
+conditional independence graph ~ volumetric MRI
+
+- Differ across age/gender
+- Sparse version
+
+Gaussian lasso
+
+Lasso regression/ Elastic net
+
+**Goal**
+
+Investigate if correlation change across age under `telencephalon`
+
+**Method**
+
+Permutation test
+
+**Results**
+
+```R
+# data22data31   2  10
+# "CerebralNucli_L CerebralNucli_R"
+# data22data26   1  12
+# "CerebralNucli_L WhiteMatter_R"
+# data26data31   4  14
+# "CerebralNucli_R WhiteMatter_R"
+```
