@@ -129,17 +129,6 @@ lapply(colnames(data), function(i){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 # cor res_detailed
 
 ```{r}
@@ -205,10 +194,31 @@ lapply(vec, function(i){
 
 ```
 
+
+# regression model
+```{r}
+regression_data = data %>% select(-rawid)
+# regression_data = data %>% select(-rawid,-Age,-Gender)
+regression_res = list()
+
+for (i in colnames(regression_data)[1:6]) {
+  fml = paste0(i,"~.") %>% as.formula()
+  model = glm(fml, family = gaussian, data = regression_data)
+  regression_res[[i]] = model
+}
+
+lapply(regression_res,summary)
+```
+
+
+
+
 # Does spearman correlation change across age?
 
 
 ```{r}
+rm(list = ls())
+load(file = 'data.Rda')
 data22 = data %>% filter(Age == '22-25')
 data26 = data %>% filter(Age == '26-30')
 data31 = data %>% filter(Age == '31-35')
@@ -226,20 +236,6 @@ lapply(vec, function(i){
 })
 ```
 
-# regression model
-```{r}
-regression_data = data %>% select(-rawid)
-# regression_data = data %>% select(-rawid,-Age,-Gender)
-regression_res = list()
-
-for (i in colnames(regression_data)[1:6]) {
-  fml = paste0(i,"~.") %>% as.formula()
-  model = glm(fml, family = gaussian, data = regression_data)
-  regression_res[[i]] = model
-}
-
-lapply(regression_res,summary)
-```
 
 
 # permutation test(not the mean, cor efficients)
@@ -299,7 +295,7 @@ which(age_res <= 0.05, arr.ind = TRUE)
 
 
 
-
+# 3 regions 
 # data22data31   2  10
 # "CerebralNucli_L CerebralNucli_R"
 # data22data26   1  12
