@@ -273,7 +273,7 @@ for(j in 1:dim(vec)[1]){
   i = vec2[i,]
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
-  re_diff = replicate(1000, test(data1,data2,i))
+  re_diff = replicate(5000, test(data1,data2,i))
   # hist(re_diff)
   p_value = mean(abs(tr_diff) >= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
@@ -294,18 +294,19 @@ which(age_res <= 0.05, arr.ind = TRUE)
 # }) %>% view()
 
 
+# 22-26-31-36
 
-# 3 regions 
-# data22data31   2  10
-# "CerebralNucli_L CerebralNucli_R"
-# data22data26   1  12
-# "CerebralNucli_L WhiteMatter_R"
 # data26data31   4  14
 # "CerebralNucli_R WhiteMatter_R"
 ```
 
 
-
+```{r}
+cor.test(data26$CerebralNucli_R, data26$WhiteMatter_R, method = 'spearman')
+cor.test(data31$CerebralNucli_R, data31$WhiteMatter_R, method = 'spearman')
+# cor.test(data26$CerebralNucli_R, data26$WhiteMatter_R, method = 'pearson')
+# cor.test(data31$CerebralNucli_R, data31$WhiteMatter_R, method = 'pearson')
+```
 
 # garbage code
 
