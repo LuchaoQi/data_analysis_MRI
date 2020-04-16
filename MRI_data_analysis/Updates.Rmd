@@ -132,14 +132,16 @@ lapply(colnames(data), function(i){
 # cor res_detailed
 
 ```{r}
-data = data.frame(id,data)
-ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
-colnames(ref)[1] = 'rawid'
-
-data[1] = as.numeric(unlist(data[1]))
-data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
-
-save(data,file = 'data.Rda')
+# data = data.frame(id,data)
+# ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+# colnames(ref)[1] = 'rawid'
+# 
+# data[1] = as.numeric(unlist(data[1]))
+# data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+# 
+# save(data,file = 'data.Rda')
+rm(list = ls())
+load(file='data.Rda')
 data_M = filter(data,Gender == 'M')
 data_F = filter(data,Gender == 'F')
 
@@ -155,7 +157,7 @@ test = function(x,y){
 sex_res = lapply(2:7, function(i){
   tr_diff = mean(data_M[i] %>% unlist ) - mean(data_F[i] %>% unlist)
   re_diff = replicate(1000, test(data_M[i]%>%unlist, data_F[i] %>% unlist))
-  p_value = mean(abs(re_diff)>=abs(tr_diff))
+  p_value = mean(abs(tr_diff)>=abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
 colnames(sex_res) = colnames(data)[2:7]
 
@@ -307,6 +309,58 @@ cor.test(data31$CerebralNucli_R, data31$WhiteMatter_R, method = 'spearman')
 # cor.test(data26$CerebralNucli_R, data26$WhiteMatter_R, method = 'pearson')
 # cor.test(data31$CerebralNucli_R, data31$WhiteMatter_R, method = 'pearson')
 ```
+
+# Permutation test, does correlation changes across sex?
+
+```{r}
+rm(list = ls())
+load(file = 'data.Rda')
+data_M = filter(data,Gender == 'M')
+data_F = filter(data,Gender == 'F')
+
+library(gtools)
+vec = combinations(2,2,c('data_M','data_F'))
+sex_res = list()
+
+
+test = function(data1,data2,i){
+  l1 = dim(data1)[1]
+  l2 = dim(data2)[1]
+  data = c(data1[i[1]],data1[i[2]],data2[i[1]],data2[i[2]]) %>% unlist
+  #shuffle
+  data = sample(data,replace = F)
+  cor(data[1:l1],data[(1+l1):(2*l1)], method = 'spearman')-
+    cor(data[(2*l1+1):(2*l1+l2)],data[(2*l1+l2+1):(2*l1+2*l2)], method = 'spearman')
+}
+
+
+roi = colnames(data)[2:7]
+vec2 = combinations(length(roi),2,roi)
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(1:dim(vec2)[1], function(i){
+  i = vec2[i,]
+  tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
+  tr_diff = tr_diff %>% as.numeric()
+  re_diff = replicate(10000, test(data1,data2,i))
+  # hist(re_diff)
+  p_value = mean(abs(tr_diff) >= abs(re_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  # paste0(i,collapse = ' ')
+  colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
+  sex_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+sex_res = do.call(rbind.data.frame, sex_res)
+sex_res
+
+
+which(sex_res <= 0.05, arr.ind = TRUE)
+
+```
+
 
 # garbage code
 
