@@ -23,7 +23,7 @@ save(data, file = 'raw.rda')
 ```
 
 
-# type 1 level 1
+# choose type and level
 ```{r}
 # note function spreadROIs() doesn't work very well
 # data = readFileList(fileList = file_list,fixBF = TRUE) %>% spreadROIs()
