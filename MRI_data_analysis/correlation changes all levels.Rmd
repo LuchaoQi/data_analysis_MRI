@@ -1,0 +1,69 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+
+```{r, eval=F,include=F}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+
+roiDir = paste0(getwd(),'/data')
+file_list = dir(roiDir)
+# readSubjectDf(file_list[1])$level
+
+# run it in console
+# setwd("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/data")
+data = readFileList(fileList = file_list,fixBF = TRUE)
+save(data, file = 'raw.rda')
+
+
+```
+
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+load(file = 'raw.rda')
+
+
+# convert the rawid to be compatible with the format in lookup table
+data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
+data$rawid = as.numeric(data$rawid)
+
+data = na.omit(data)
+```
+
+
+```{r}
+ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+colnames(ref)[1] = 'rawid'
+
+# data[1] = as.numeric(unlist(data[1]))
+data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+
+save(data,file = 'data.Rda')
+```
+
+
+# type 1 level 1
+```{r}
+table(data %>% filter(type==1,level==1) %>% select(roi))
+
+data = data %>% filter(type==1,level==1) %>% 
+  select(rawid,roi,volume) %>% spread(roi,volume) 
+
+# compositional analysis
+data = cbind(data[1],prop.table(as.matrix(data[-1]), margin = 1))
+
+# normalization
+data = apply(data, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
+
+```
+

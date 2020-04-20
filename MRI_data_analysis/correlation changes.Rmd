@@ -71,8 +71,9 @@ data = data[-1]
 
 
 
-# normalization
-```{r}
+# no need to normalize for correlation?
+
+```{r, eval=F,include=F}
 library(ggplot2)
 
 
