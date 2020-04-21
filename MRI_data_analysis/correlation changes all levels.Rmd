@@ -154,9 +154,13 @@ sex_res_type1_level1 = sex_res
 # results
 
 ```{r}
+rm(list = ls())
 load(file = 'type1_level1')
 temp = age_res_type1_level1
 which(temp <= 0.05, arr.ind = TRUE)
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
 ind = which(temp <= 0.05, arr.ind = TRUE)
 apply(ind, MARGIN = 1, function(i){
   d1 = get(paste0('data',strsplit(rownames(temp)[i[1]],split = 'data')[[1]][2]))
@@ -171,7 +175,7 @@ apply(ind, MARGIN = 1, function(i){
         cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist, method = "spearman")$p.value,
         sep = "/")}
 })
-# save(age_res_type1_level1,sex_res_type1_level1,file = 'type1_level1')
+# save(data,age_res_type1_level1,sex_res_type1_level1,file = 'type1_level1')
 ```
 
 
@@ -191,13 +195,15 @@ rawdata = na.omit(data)
 ```
 
 
-# type 1 level 2
+# type 1 level 2 Telencephalon
 ```{r}
 table(rawdata %>% filter(type==1,level==2) %>% select(roi))
 
+
 data = rawdata %>% filter(type==1,level==2) %>% 
   select(rawid,roi,volume) %>% spread(roi,volume) 
-
+data = data %>% select(rawid,CerebralCortex_L,CerebralNucli_L,WhiteMatter_L,
+                        CerebralCortex_R,CerebralNucli_R,WhiteMatter_R)
 # compositional analysis
 data = cbind(data[1],prop.table(as.matrix(data %>% select(-rawid)), margin = 1))
 
@@ -301,7 +307,162 @@ sex_res_type1_level2 = sex_res
 # results
 
 ```{r}
-load(file = 'type1_level2')
+rm(list = ls())
+load(file = 'type1_level2_Telencephalon')
+temp = age_res_type1_level2
+which(temp <= 0.05, arr.ind = TRUE)
+ind = which(temp <= 0.05, arr.ind = TRUE)
+
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+
+apply(ind, MARGIN = 1, function(i){
+  d1 = get(paste0('data',strsplit(rownames(temp)[i[1]],split = 'data')[[1]][2]))
+  d2 = get(paste0('data',strsplit(rownames(temp)[i[1]],split = 'data')[[1]][3]))
+  roi1 = strsplit(colnames(temp[i[2]]),' ')[[1]][1]
+  roi2 = strsplit(colnames(temp[i[2]]),' ')[[1]][2]
+  if(cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist)$p.value <= 0.05 &
+     cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value <= 0.05){
+    paste(rownames(temp)[i[1]],
+        colnames(temp)[i[2]],
+        cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist)$p.value,
+        cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value,
+        sep = "/")}
+})
+# save(data,age_res_type1_level2,sex_res_type1_level2,file = 'type1_level2_Telencephalon')
+```
+
+
+
+# type 1 level 2 Diencephalon
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+load(file = 'raw.rda')
+
+
+# convert the rawid to be compatible with the format in lookup table
+data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
+data$rawid = as.numeric(data$rawid)
+
+rawdata = na.omit(data)
+```
+
+```{r}
+table(rawdata %>% filter(type==1,level==2) %>% select(roi))
+
+
+data = rawdata %>% filter(type==1,level==2) %>% 
+  select(rawid,roi,volume) %>% spread(roi,volume) 
+data = data %>% select(rawid,Thalamus_L,Thalamus_R,
+                       BasalForebrain_L,BasalForebrain_R)
+# compositional analysis
+data = cbind(data[1],prop.table(as.matrix(data %>% select(-rawid)), margin = 1))
+
+# add age/gender
+
+ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+colnames(ref)[1] = 'rawid'
+data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+```
+
+```{r}
+data22 = data %>% filter(Age == '22-25')
+data26 = data %>% filter(Age == '26-30')
+data31 = data %>% filter(Age == '31-35')
+# data36 = data %>% filter(Age == '36+')
+
+library(gtools)
+vec = combinations(3,2,c('data22','data26','data31'))
+age_res = list()
+
+
+test = function(data1,data2,i){
+  l1 = dim(data1)[1]
+  l2 = dim(data2)[1]
+  data = c(data1[i[1]],data1[i[2]],data2[i[1]],data2[i[2]]) %>% unlist
+  #shuffle
+  data = sample(data,replace = F)
+  cor(data[1:l1],data[(1+l1):(2*l1)], method = 'spearman')-
+    cor(data[(2*l1+1):(2*l1+l2)],data[(2*l1+l2+1):(2*l1+2*l2)], method = 'spearman')
+}
+
+
+roi = colnames(data %>% select(-rawid,-Age,-Gender))
+vec2 = combinations(length(roi),2,roi)
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(1:dim(vec2)[1], function(i){
+  i = vec2[i,]
+  tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
+  tr_diff = tr_diff %>% as.numeric()
+  re_diff = replicate(10000, test(data1,data2,i))
+  p_value = mean(abs(tr_diff) >= abs(re_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
+  age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+age_res = do.call(rbind.data.frame, age_res)
+# which(age_res <= 0.05, arr.ind = TRUE)
+
+
+# age_res_type1_level1 = age_res * (age_res<=0.05)
+age_res_type1_level2 = age_res
+
+
+
+data_M = filter(data,Gender == 'M')
+data_F = filter(data,Gender == 'F')
+
+library(gtools)
+vec = combinations(2,2,c('data_M','data_F'))
+sex_res = list()
+
+
+test = function(data1,data2,i){
+  l1 = dim(data1)[1]
+  l2 = dim(data2)[1]
+  data = c(data1[i[1]],data1[i[2]],data2[i[1]],data2[i[2]]) %>% unlist
+  #shuffle
+  data = sample(data,replace = F)
+  cor(data[1:l1],data[(1+l1):(2*l1)], method = 'spearman')-
+    cor(data[(2*l1+1):(2*l1+l2)],data[(2*l1+l2+1):(2*l1+2*l2)], method = 'spearman')
+}
+
+
+roi = colnames(data %>% select(-rawid,-Age,-Gender))
+vec2 = combinations(length(roi),2,roi)
+
+for(j in 1:dim(vec)[1]){
+  data1 = get(vec[j,1])
+  data2 = get(vec[j,2])
+  perm_res = lapply(1:dim(vec2)[1], function(i){
+  i = vec2[i,]
+  tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
+  tr_diff = tr_diff %>% as.numeric()
+  re_diff = replicate(10000, test(data1,data2,i))
+  p_value = mean(abs(tr_diff) >= abs(re_diff))
+}) %>% do.call(what='cbind') %>% as.data.frame()
+  colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
+  sex_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
+}
+
+sex_res = do.call(rbind.data.frame, sex_res)
+# which(sex_res <= 0.05, arr.ind = TRUE)
+sex_res_type1_level2 = sex_res
+# sex_res_type1_level1 = sex_res * (sex_res<=0.05)
+```
+
+# results
+
+```{r}
+load(file = 'type1_level2_Diencephalon')
 temp = age_res_type1_level2
 which(temp <= 0.05, arr.ind = TRUE)
 ind = which(temp <= 0.05, arr.ind = TRUE)
@@ -318,5 +479,7 @@ apply(ind, MARGIN = 1, function(i){
         cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value,
         sep = "/")}
 })
-save(age_res_type1_level1,sex_res_type1_level1,file = 'type1_level1')
+# save(data,age_res_type1_level2,sex_res_type1_level2,file = 'type1_level2_Diencephalon')
 ```
+
+
