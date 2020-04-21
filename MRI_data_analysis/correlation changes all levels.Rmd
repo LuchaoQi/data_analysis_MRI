@@ -154,6 +154,7 @@ sex_res_type1_level1 = sex_res
 # results
 
 ```{r}
+load(file = 'type1_level1')
 temp = age_res_type1_level1
 which(temp <= 0.05, arr.ind = TRUE)
 ind = which(temp <= 0.05, arr.ind = TRUE)
@@ -162,15 +163,15 @@ apply(ind, MARGIN = 1, function(i){
   d2 = get(paste0('data',strsplit(rownames(temp)[i[1]],split = 'data')[[1]][3]))
   roi1 = strsplit(colnames(temp[i[2]]),' ')[[1]][1]
   roi2 = strsplit(colnames(temp[i[2]]),' ')[[1]][2]
-  if(cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist)$p.value <= 0.05 &
-     cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value <= 0.05){
+  if(cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist, method = "spearman")$p.value <= 0.05 &
+     cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist, method = "spearman")$p.value <= 0.05){
     paste(rownames(temp)[i[1]],
         colnames(temp)[i[2]],
-        cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist)$p.value,
-        cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value,
+        cor.test(d1[roi1] %>% unlist,d1[roi2] %>% unlist, method = "spearman")$p.value,
+        cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist, method = "spearman")$p.value,
         sep = "/")}
 })
-save(age_res_type1_level1,sex_res_type1_level1,)
+# save(age_res_type1_level1,sex_res_type1_level1,file = 'type1_level1')
 ```
 
 
@@ -300,6 +301,7 @@ sex_res_type1_level2 = sex_res
 # results
 
 ```{r}
+load(file = 'type1_level2')
 temp = age_res_type1_level2
 which(temp <= 0.05, arr.ind = TRUE)
 ind = which(temp <= 0.05, arr.ind = TRUE)
@@ -316,5 +318,5 @@ apply(ind, MARGIN = 1, function(i){
         cor.test(d2[roi1] %>% unlist,d2[roi2] %>% unlist)$p.value,
         sep = "/")}
 })
-
+save(age_res_type1_level1,sex_res_type1_level1,file = 'type1_level1')
 ```
