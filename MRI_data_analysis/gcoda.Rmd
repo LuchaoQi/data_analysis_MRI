@@ -1,0 +1,94 @@
+```{r, eval=F,include=F}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+
+roiDir = paste0(getwd(),'/data')
+file_list = dir(roiDir)
+# readSubjectDf(file_list[1])$level
+
+# run it in console
+# setwd("C:/Users/lcqi/Desktop/data_analysis_bcaffo_lab/MRI_data_analysis/data")
+data = readFileList(fileList = file_list,fixBF = TRUE)
+save(data, file = 'raw.rda')
+
+
+```
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(MRIcloudT1volumetrics)
+
+load(file = 'raw.rda')
+
+
+# convert the rawid to be compatible with the format in lookup table
+data$rawid = sapply(strsplit(data$rawid,"_"),function(x) x[1])
+data$rawid = as.numeric(data$rawid)
+
+rawdata = na.omit(data)
+```
+
+# type 1 level 1
+```{r}
+table(rawdata %>% filter(type==1,level==1) %>% select(roi))
+
+data = rawdata %>% filter(type==1,level==1) %>% 
+  select(rawid,roi,volume) %>% spread(roi,volume) 
+
+# compositional analysis
+data = cbind(data[1],prop.table(as.matrix(data %>% select(-rawid)), margin = 1))
+
+# add age/gender
+
+ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
+colnames(ref)[1] = 'rawid'
+data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
+
+dat = data %>% select(-rawid,-Age,-Gender)
+```
+
+# try inverse of covariance matrix using matlib
+```{r}
+library(matlib)
+det(cov(dat))
+inv(cov(dat))
+```
+
+# gcoda
+https://github.com/huayingfang/gCoda
+```{r}
+source('gcoda.R')
+res_gcoda_frac <- gcoda(x = dat, counts = F)
+print(round(res_gcoda_frac$opt.icov, 2))
+```
+
+# test
+
+```{r}
+source('gcoda.R')
+#-------------------------------------------------------------------------------
+# 1 Basic example (no edges in the conditional dependence network)
+# 1.1 Generate logistic normal variables
+n <- 100;
+p <- 20;
+x <- matrix(rnorm(n * p), nrow = n); 
+x.frac <- exp(x) / rowSums(exp((x)));
+totCount <- round(runif(n = n,  min = 1000, max = 2000));
+x.count <- x.frac * totCount;
+# 1.2 Run gCoda 
+# using fraction
+res_gcoda_frac <- gcoda(x = x.frac, counts = F);
+# using counts
+res_gcoda_count <- gcoda(x = x.count, counts = T);
+# 1.3 Get the estimation of the inverse covariance matrix
+{
+  cat("gCoda using fraction data:\n");
+  print(round(res_gcoda_frac$opt.icov, 2));
+  cat("gCoda using count data:\n");
+  print(round(res_gcoda_count$opt.icov, 2));
+}
+```
+
