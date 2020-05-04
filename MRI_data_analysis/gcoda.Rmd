@@ -47,8 +47,12 @@ ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.cs
 colnames(ref)[1] = 'rawid'
 data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
 
+
 dat = data %>% select(-rawid,-Age,-Gender)
+# should we normalize columns?
+# dat = apply(dat, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
 ```
+
 
 # try inverse of covariance matrix using matlib
 ```{r}
