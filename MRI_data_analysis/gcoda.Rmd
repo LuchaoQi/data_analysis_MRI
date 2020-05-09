@@ -54,20 +54,40 @@ dat = data %>% select(-rawid,-Age,-Gender)
 ```
 
 
-# try inverse of covariance matrix using matlib
+
+
+# glasso
 ```{r}
-library(matlib)
-det(cov(dat))
-inv(cov(dat))
+library(glasso)
+# lapply(seq(1e-5,1e-1,length.out = 3), function(i){
+#   glasso(cov(dat),rho = i)$wi
+# })
+
+
+glasso(cov(dat),rho = 1e-5)$wi
 ```
+
+
 
 # gcoda
 https://github.com/huayingfang/gCoda
 ```{r}
 source('gcoda.R')
-res_gcoda_frac <- gcoda(x = dat, counts = F)
+res_gcoda_frac <- gcoda(x = dat,
+                        # lambda.min.ratio = 1e-10,
+                        counts = F)
 print(round(res_gcoda_frac$opt.icov, 2))
+print(res_gcoda_frac$opt.index == length(res_gcoda_frac$lambda))
+print(res_gcoda_frac$opt.lambda)
+
+# res_gcoda_frac <- gcoda(x = dat,
+#                         # lambda.min.ratio = ,
+#                         counts = F)
+# print(round(res_gcoda_frac$opt.icov, 2))
+# print(res_gcoda_frac$opt.index == length(res_gcoda_frac$lambda))
+# print(res_gcoda_frac$ebic.score)
 ```
+
 
 # test
 
