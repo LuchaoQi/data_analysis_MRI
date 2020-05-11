@@ -48,11 +48,107 @@ colnames(ref)[1] = 'rawid'
 data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
 
 
-dat = data %>% select(-rawid,-Age,-Gender)
+# dat = data %>% select(-rawid,-Age,-Gender)
 # should we normalize columns?
 # dat = apply(dat, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
 ```
 
+```{r}
+data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender)
+data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender)
+data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender)
+
+
+library(gtools)
+vec = combinations(3,2,c('data22','data26','data31'))
+age_res = list()
+
+
+for(rho in seq(1e-40,1e-1,length.out = 100)){
+  
+  
+for(i in 1:dim(vec)[1]){
+  
+  data1 = get(vec[i,1])
+  data2 = get(vec[i,2])
+  
+  # true difference between estimation
+  e1 = glasso(cov(data1),rho = rho)$wi
+  e2 = glasso(cov(data2),rho = rho)$wi
+  tr_diff = e1 - e2
+  colnames(tr_diff) = colnames(cov(data1))
+  rownames(tr_diff) = colnames(tr_diff)
+  index = list()
+  for(y in 1:(dim(tr_diff)[1]-1)){
+    for(x in (y+1):dim(tr_diff)[2]){
+      idx = c(y,x)
+      if(  
+        ((e1[idx[1],idx[2]] * e2[idx[1],idx[2]]) == 0) &
+        ((e1[idx[1],idx[2]] + e2[idx[1],idx[2]]) != 0)
+         ){index = append(index,list(idx))}
+    }
+  }
+  
+  # permutation test
+  test = function(data1,data2){
+  #shuffle
+  data = c(unlist(data1),unlist(data2))
+  data = sample(data,replace = F)
+  new_data1 = data[1:(dim(data1)[1]*dim(data1)[2])] %>% matrix(nrow=dim(data1)[1],ncol=dim(data1)[2])
+  new_data2 = data[(dim(data1)[1]*dim(data1)[2]+1):length(data)] %>% matrix(nrow=dim(data2)[1],ncol=dim(data2)[2])
+  perm_diff = glasso(cov(new_data1),rho = rho)$wi - glasso(cov(new_data2),rho = rho)$wi
+  colnames(perm_diff) = colnames(data1)
+  rownames(perm_diff) = colnames(perm_diff)
+  
+  return(perm_diff)
+  }
+  
+  n = 5000
+  re_diff = replicate(n, test(data1,data2))
+  
+  # calculate p-values
+  # only need to calculate triangular part
+  p_matrix = tr_diff * NA
+  
+  for(idx in index){
+    tr_value = tr_diff[idx[1],idx[2]]
+    p_matrix[idx[1],idx[2]] = mean(
+      abs(tr_value) >= abs(re_diff[idx[1],idx[2],])
+      )
+  }
+  
+  
+  # for(y in 1:(dim(tr_diff)[1]-1)){
+  #   for(x in (y+1):dim(tr_diff)[2]){
+  #     index = c(y,x)
+  #     tr_value = tr_diff[index[1],index[2]]
+  #     for (i in 1:n) {
+  #       p_value = mean(abs(tr_value) >= abs(re_diff[,,n][index[1],index[2]]))
+  #     }
+  #   }
+  # }
+  # tr_diff = tr_diff * (tr_diff %>% upper.tri())
+  
+  
+}
+  if(!(sum(p_matrix<=0.05) %>% is.na)){
+    age_res[[paste(vec[i,1],vec[i,2],rho,sep='&')]] = p_matrix
+  }
+}
+
+```
+
+  # only need to compute triangular part
+
+```{r}
+temp = glasso(cov(data1),rho = 1e-5)$wi
+colnames(temp) = colnames(data1)
+rownames(temp) = colnames(temp)
+
+```
+```{r}
+for(x in dim(temp)){print(x)}
+```
 
 
 
@@ -65,9 +161,18 @@ library(glasso)
 
 
 glasso(cov(dat),rho = 1e-5)$wi
+
+glasso(cov(dat),rho = 1e-5)$wi * (glasso(cov(dat),rho = 1e-5)$wi %>% upper.tri())
 ```
 
 
+
+
+
+
+
+
+# garbage code
 
 # gcoda
 https://github.com/huayingfang/gCoda
