@@ -46,19 +46,17 @@ data = cbind(data[1],prop.table(as.matrix(data %>% select(-rawid)), margin = 1))
 ref = read.csv(paste0(getwd(),'/unrestricted_bcaffo_12_12_2017_12_17_8.csv%3B.csv'), header = T)
 colnames(ref)[1] = 'rawid'
 data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
-
-
+data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender)
+data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender)
+data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender)
+hist(data22 %>% unlist)
 # dat = data %>% select(-rawid,-Age,-Gender)
 # should we normalize columns?
 # dat = apply(dat, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
 ```
 
+# permutation test
 ```{r}
-data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender)
-data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender)
-data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender)
-
-
 library(gtools)
 vec = combinations(3,2,c('data22','data26','data31'))
 age_res = list()
@@ -79,6 +77,8 @@ for(i in 1:dim(vec)[1]){
   colnames(tr_diff) = colnames(cov(data1))
   rownames(tr_diff) = colnames(tr_diff)
   index = list()
+  
+  # only need to compute triangular part
   for(y in 1:(dim(tr_diff)[1]-1)){
     for(x in (y+1):dim(tr_diff)[2]){
       idx = c(y,x)
@@ -138,7 +138,7 @@ for(i in 1:dim(vec)[1]){
 
 ```
 
-  # only need to compute triangular part
+  
 
 ```{r}
 temp = glasso(cov(data1),rho = 1e-5)$wi
