@@ -94,7 +94,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
@@ -139,7 +139,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   sex_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
@@ -247,7 +247,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
@@ -292,7 +292,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   sex_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
@@ -404,7 +404,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   age_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
@@ -449,7 +449,7 @@ for(j in 1:dim(vec)[1]){
   tr_diff = cor(data1[i[1]],data1[i[2]], method = 'spearman') - cor(data2[i[1]],data2[i[2]],  method = 'spearman')
   tr_diff = tr_diff %>% as.numeric()
   re_diff = replicate(10000, test(data1,data2,i))
-  p_value = mean(abs(tr_diff) >= abs(re_diff))
+  p_value = mean(abs(tr_diff) <= abs(re_diff))
 }) %>% do.call(what='cbind') %>% as.data.frame()
   colnames(perm_res) = apply(vec2,MARGIN = 1, function(i) paste0(i,collapse = ' '))
   sex_res[[paste0(vec[j,1],vec[j,2])]] = perm_res
