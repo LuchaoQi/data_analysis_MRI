@@ -51,9 +51,9 @@ data = left_join(data, ref[,c('rawid','Age','Gender')], by="rawid") %>% na.omit
 # data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender)
 # data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender) 
 
-data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender) %>% scale
-data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender) %>% scale
-data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender) %>% scale
+data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender) 
+data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender) 
+data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender) 
 # hist(data22 %>% unlist)
 # dat = data %>% select(-rawid,-Age,-Gender)
 # should we normalize columns?
@@ -77,8 +77,8 @@ for(i in 1:dim(vec)[1]){
   data2 = get(vec[i,2])
   
   # true difference between estimation
-  e1 = glasso(cov(data1),rho = rho)$wi
-  e2 = glasso(cov(data2),rho = rho)$wi
+  e1 = glasso(cov(data1 %>% scale ),rho = rho)$wi
+  e2 = glasso(cov(data2 %>% scale ),rho = rho)$wi
   tr_diff = e1 - e2
   colnames(tr_diff) = colnames(cov(data1))
   rownames(tr_diff) = colnames(tr_diff)
@@ -100,9 +100,9 @@ for(i in 1:dim(vec)[1]){
   #shuffle
   new_data = c(unlist(data1),unlist(data2))
   new_data = sample(new_data,replace = F)
-  new_data1 = new_data[1:(dim(data1)[1]*dim(data1)[2])] %>% matrix(nrow=dim(data1)[1],ncol=dim(data1)[2]) %>% scale()
-  new_data2 = new_data[(dim(data1)[1]*dim(data1)[2]+1):length(new_data)] %>% matrix(nrow=dim(data2)[1],ncol=dim(data2)[2]) %>% scale()
-  perm_diff = glasso(cov(new_data1),rho = rho)$wi - glasso(cov(new_data2),rho = rho)$wi
+  new_data1 = new_data[1:(dim(data1)[1]*dim(data1)[2])] %>% matrix(nrow=dim(data1)[1],ncol=dim(data1)[2])
+  new_data2 = new_data[(dim(data1)[1]*dim(data1)[2]+1):length(new_data)] %>% matrix(nrow=dim(data2)[1],ncol=dim(data2)[2])
+  perm_diff = glasso(cov(new_data1 %>% scale),rho = rho)$wi - glasso(cov(new_data2 %>% scale ),rho = rho)$wi
   colnames(perm_diff) = colnames(data1)
   rownames(perm_diff) = colnames(perm_diff)
   
