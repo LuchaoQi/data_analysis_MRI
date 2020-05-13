@@ -55,9 +55,6 @@ data22 = data %>% filter(Age == '22-25') %>% select(-rawid,-Age,-Gender)
 data26 = data %>% filter(Age == '26-30') %>% select(-rawid,-Age,-Gender) 
 data31 = data %>% filter(Age == '31-35') %>% select(-rawid,-Age,-Gender) 
 # hist(data22 %>% unlist)
-# dat = data %>% select(-rawid,-Age,-Gender)
-# should we normalize columns?
-# dat = apply(dat, MARGIN = 2, FUN = function(i){ scale(i) }) %>% as.data.frame()
 ```
 
 # permutation test
