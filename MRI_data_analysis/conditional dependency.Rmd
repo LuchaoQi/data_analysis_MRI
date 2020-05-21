@@ -138,7 +138,7 @@ for(i in 1:dim(vec)[1]){
     age_res[[paste(vec[i,1],vec[i,2],rho,sep='&')]] = p_matrix
   }
 }
-
+# save(age_res,file='age_res.Rdata')
 ```
 
   
