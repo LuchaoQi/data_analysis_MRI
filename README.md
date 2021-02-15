@@ -1,52 +1,13 @@
-# Data analysis bcaffo lab
-
-
-
-[R package](https://github.com/bcaffo/MRIcloudT1volumetrics)
-
-
+# Data analysis - bcaffo lab
 
 ### Summary
 
-> This is a compositional data analysis project based on MRI data. The goal is to perform PCA analysis and predict the Age of patients based on PC scores of ROIs. All functions are intended to be built into [`MRIcloudT1volumetrics`](https://github.com/bcaffo/MRIcloudT1volumetrics) package.
-* Convert MRI volumes to compositional data
-
-* PCA
-
-* Multinomial prediction `multinom` on Age based on `PC scores`
-
-* Low ACC still need to be solved
-
----
-
-1/10/2020
-
-**Updates**
-
-**Goal**
-
-We want to find the most predictable region and the most important variable to investigate associations b/w ROIs
-
-**Method**
-
-conditional independence graph ~ volumetric MRI
-
-- Differ across age/gender
-- Sparse version
-
-Gaussian lasso
-
-Lasso regression/ Elastic net
-
-**Goal**
-
-Investigate if correlation change across age under `telencephalon`
-
-**Method**
-
-Permutation test
-
-**Results**
+> Data analysis project on MRI data. 
+>
+> One goal is to perform PCA analysis and predict the age of patients based on PC scores of ROIs. All functions are incorporated into [`MRIcloudT1volumetrics`](https://github.com/bcaffo/MRIcloudT1volumetrics) package.
+>
+> Another goal is to explore changes of conditional dependencies of volumetric MRI across different levels. Also, we are curious if conditional dependencies differ across age/gender? Methods include gaussian graphical lasso and permutation test.
+Permutation results:
 
 ```R
 # data22data31   2  10
